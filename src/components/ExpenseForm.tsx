@@ -90,10 +90,10 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
               onClick={() => setTaxRate(r)}
               style={{
                 ...chipStyle,
-                background: taxRate === r ? 'var(--color-background-info)' : 'var(--color-background-secondary)',
-                color: taxRate === r ? 'var(--color-text-info)' : 'var(--color-text-secondary)',
-                border: taxRate === r ? '1px solid transparent' : '0.5px solid var(--color-border-secondary)',
-                fontWeight: taxRate === r ? 500 : 400,
+                  background: taxRate === r ? '#1a1a1a' : 'var(--color-background-secondary)',
+                  color: taxRate === r ? '#ffffff' : 'var(--color-text-secondary)',
+                  border: taxRate === r ? '1px solid #1a1a1a' : '0.5px solid var(--color-border-secondary)',
+                  fontWeight: taxRate === r ? 600 : 400,
               }}
             >
               {r}%
@@ -139,9 +139,9 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
               style={{
                 ...chipStyle,
                 flex: 1,
-                background: expenseType === t ? 'var(--color-background-warning)' : 'var(--color-background-secondary)',
-                color: expenseType === t ? 'var(--color-text-warning)' : 'var(--color-text-secondary)',
-                border: expenseType === t ? '1px solid transparent' : '0.5px solid var(--color-border-secondary)',
+                background: expenseType === t ? '#1a1a1a' : 'var(--color-background-secondary)',
+                color: expenseType === t ? '#ffffff' : 'var(--color-text-secondary)',
+                border: expenseType === t ? '1px solid #1a1a1a' : '0.5px solid var(--color-border-secondary)',
                 fontWeight: expenseType === t ? 500 : 400,
                 padding: '8px 0',
               }}
@@ -156,7 +156,20 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
       <div>
         <button
           onClick={() => setShowDetail(v => !v)}
-          style={{ background: 'none', border: 'none', color: 'var(--color-text-info)', fontSize: 13, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}
+        style={{
+          background: 'var(--color-background-secondary)',
+          border: '0.5px solid var(--color-border-secondary)',
+          borderRadius: 8,
+          color: 'var(--color-text-secondary)',
+          fontSize: 13,
+          cursor: 'pointer',
+          padding: '8px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          width: '100%',
+          justifyContent: 'center',
+        }}
         >
           {showDetail ? '▲ 詳細を閉じる' : '＋ 詳細（利用目的・メモ）'}
         </button>
