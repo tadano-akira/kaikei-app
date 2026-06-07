@@ -1,0 +1,39 @@
+// 勘定科目
+export type AccountCategory =
+  | '通信費'
+  | '消耗品費'
+  | '地代家賃'
+  | '外注費'
+  | '旅費交通費'
+  | '接待交際費'
+  | '広告宣伝費'
+  | '水道光熱費'
+  | '新聞図書費'
+  | 'ソフトウェア利用料'
+  | '雑費';
+
+// 税率
+export type TaxRate = 0 | 8 | 10;
+
+// 固定費 / 変動費
+export type ExpenseType = '固定費' | '変動費';
+
+// 経費データ
+export interface Expense {
+  id: string;
+  date: string;           // YYYY-MM-DD
+  category: AccountCategory;
+  amountWithTax: number;  // 税込金額
+  taxRate: TaxRate;
+  amountWithoutTax: number; // 税抜金額（自動計算）
+  taxAmount: number;        // 消費税額（自動計算）
+  payee: string;            // 支払先
+  expenseType: ExpenseType;
+  purpose?: string;         // 利用目的（任意）
+  memo?: string;            // メモ（任意）
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 経費入力フォーム用（idや計算値を除いた入力データ）
+export type ExpenseInput = Omit<Expense, 'id' | 'amountWithoutTax' | 'taxAmount' | 'createdAt' | 'updatedAt'>;
