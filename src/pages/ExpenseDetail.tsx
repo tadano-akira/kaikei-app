@@ -1,5 +1,5 @@
 import { Expense } from '../types';
-import { formatCurrency, formatMonthLabel, formatDate } from '../constants';
+import { formatCurrency, formatDate } from '../constants';
 import { useState } from 'react';
 
 interface Props {

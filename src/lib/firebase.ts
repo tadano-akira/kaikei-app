@@ -7,6 +7,7 @@
 // VITE_FIREBASE_STORAGE_BUCKET=xxx.appspot.com
 // VITE_FIREBASE_MESSAGING_SENDER_ID=xxx
 // VITE_FIREBASE_APP_ID=xxx
+/// <reference types="vite/client" />
 
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
