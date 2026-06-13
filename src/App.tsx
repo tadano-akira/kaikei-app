@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Expense, Sales } from './types';
 import { useExpenses } from './hooks/useExpenses';
 import { useSales } from './hooks/useSales';
+import { useSettings } from './hooks/useSettings';
 import { useAuth } from './hooks/useAuth';
 import { ExpenseList } from './pages/ExpenseList';
 import { ExpenseDetail } from './pages/ExpenseDetail';
@@ -9,13 +10,14 @@ import { ExpenseForm } from './components/ExpenseForm';
 import { SalesList } from './pages/SalesList';
 import { SalesDetail } from './pages/SalesDetail';
 import { SalesForm } from './components/SalesForm';
+import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './pages/LoginPage';
 import { TodoPage } from './pages/TodoPage';
 import { MemoPage } from './pages/MemoPage';
 import { NotepadPage } from './pages/NotepadPage';
 import { DailyReportPage } from './pages/DailyReportPage';
 
-type Tab = 'expense' | 'todo' | 'memo' | 'notepad' | 'daily';
+type Tab = 'expense' | 'todo' | 'memo' | 'notepad' | 'daily' | 'settings';
 type AccountSubTab = 'expense' | 'sales';
 
 type Screen =
@@ -34,6 +36,7 @@ export default function App() {
   const { user, loading, login, logout } = useAuth();
   const { save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, currentMonthTotal: expenseMonthTotal, firestoreLoading: expenseLoading } = useExpenses();
   const { save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales();
+  const { settings, loading: settingsLoading, save: saveSettings } = useSettings();
 
   const [tab, setTab] = useState<Tab>('expense');
   const [subTab, setSubTab] = useState<AccountSubTab>('expense');
@@ -84,6 +87,7 @@ export default function App() {
     if (tab === 'memo') return 'メモ';
     if (tab === 'notepad') return 'テキスト';
     if (tab === 'daily') return '日報';
+    if (tab === 'settings') return '設定';
   };
 
   const showEditBtn =
@@ -150,6 +154,9 @@ export default function App() {
         {tab === 'memo' && <MemoPage />}
         {tab === 'notepad' && <NotepadPage />}
         {tab === 'daily' && <DailyReportPage />}
+        {tab === 'settings' && (
+          <SettingsPage settings={settings} loading={settingsLoading} onSave={saveSettings} />
+        )}
       </main>
 
       <nav style={navStyle}>
@@ -158,6 +165,7 @@ export default function App() {
         <NavItem icon="📝" label="メモ" active={tab === 'memo'} onClick={() => setTab('memo')} />
         <NavItem icon="📄" label="テキスト" active={tab === 'notepad'} onClick={() => setTab('notepad')} />
         <NavItem icon="📋" label="日報" active={tab === 'daily'} onClick={() => setTab('daily')} />
+        <NavItem icon="⚙" label="設定" active={tab === 'settings'} onClick={() => setTab('settings')} />
       </nav>
     </div>
   );

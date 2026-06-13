@@ -87,6 +87,22 @@ export interface Sales {
 
 export type SalesInput = Omit<Sales, 'id' | 'createdAt' | 'updatedAt'>;
 
+// ===== 設定 =====
+export type ConsumptionTaxCategory = '第1種' | '第2種' | '第3種' | '第4種' | '第5種' | '第6種';
+
+export interface Settings {
+  targetExpenseRate: number;         // 目標経費率 (%)
+  residentialTaxRate: number;        // 住民税率 (%), default 10
+  consumptionTaxCategory: ConsumptionTaxCategory;
+  consumptionTaxSpecialRate: number; // 消費税特例係数 (0.0〜1.0)
+  socialInsurance: number;           // 社会保険料控除 (円)
+  dependentDeduction: number;        // 扶養控除 (円)
+  lifeInsuranceDeduction: number;    // 生命保険料控除 (円)
+  idecoDeduction: number;            // iDeCo控除 (円)
+  smallBusinessDeduction: number;    // 小規模企業共済控除 (円)
+  updatedAt: string;
+}
+
 // ===== 日報 =====
 export interface DailyReport {
   id: string;
