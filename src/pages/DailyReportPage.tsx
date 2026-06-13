@@ -94,8 +94,8 @@ const inputStyle: React.CSSProperties = {
   padding: '8px 10px',
   borderRadius: 8,
   border: '0.5px solid var(--color-border-secondary)',
-  background: 'var(--color-background-primary)',
-  color: 'var(--color-text-primary)',
+  background: 'var(--color-background-primary, #ffffff)',
+  color: 'var(--color-text-primary, #1a1a1a)',
   fontSize: 14,
   boxSizing: 'border-box',
 };
@@ -104,7 +104,7 @@ const saveBtnStyle: React.CSSProperties = { flex: 2, padding: '9px 0', borderRad
 
 
 const modalStyle: React.CSSProperties = {
-  background: 'var(--color-background-primary)',
+  background: 'var(--color-background-primary, #ffffff)',
   borderRadius: 14,
   padding: 20,
   width: '100%',
