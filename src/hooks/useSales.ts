@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   collection, doc, addDoc, updateDoc, deleteDoc,
-  onSnapshot, query, orderBy
+  onSnapshot
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { Sales, SalesInput } from '../types';
@@ -22,14 +22,18 @@ export const useSales = () => {
       const uid = user.uid;
       const year = new Date().getFullYear().toString();
       const ref = collection(db, 'users', uid, 'sales', year, 'items');
-      const q = query(ref, orderBy('date', 'desc'));
 
-      const unsubscribeSnapshot = onSnapshot(q,
+      const unsubscribeSnapshot = onSnapshot(ref,
         (snapshot) => {
-          setSales(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Sales)));
+          const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Sales));
+          items.sort((a, b) => b.date.localeCompare(a.date));
+          setSales(items);
           setFirestoreLoading(false);
         },
-        () => setFirestoreLoading(false)
+        (error) => {
+          console.error('Sales Firestoreエラー:', error);
+          setFirestoreLoading(false);
+        }
       );
 
       return unsubscribeSnapshot;
