@@ -46,13 +46,19 @@ export const useSales = () => {
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
     const now = new Date().toISOString();
-    await addDoc(getRef(uid), { ...input, createdAt: now, updatedAt: now });
+    const data = Object.fromEntries(
+      Object.entries({ ...input, createdAt: now, updatedAt: now }).filter(([, v]) => v !== undefined)
+    );
+    await addDoc(getRef(uid), data);
   };
 
   const update = async (id: string, input: SalesInput): Promise<void> => {
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
-    await updateDoc(doc(getRef(uid), id), { ...input, updatedAt: new Date().toISOString() });
+    const data = Object.fromEntries(
+      Object.entries({ ...input, updatedAt: new Date().toISOString() }).filter(([, v]) => v !== undefined)
+    );
+    await updateDoc(doc(getRef(uid), id), data);
   };
 
   const remove = async (id: string): Promise<void> => {

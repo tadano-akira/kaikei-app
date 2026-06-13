@@ -36,13 +36,10 @@ export const SalesForm = ({ initial, onSave, onCancel }: Props) => {
 
   const handleSave = () => {
     if (!validate()) return;
-    onSave({
-      date, paymentDueDate,
-      paymentDate: paymentDate || undefined,
-      status, client,
-      amount: parsedAmount,
-      memo: memo || undefined,
-    });
+    const input: SalesInput = { date, paymentDueDate, status, client, amount: parsedAmount };
+    if (paymentDate) input.paymentDate = paymentDate;
+    if (memo.trim()) input.memo = memo;
+    onSave(input);
   };
 
   return (
