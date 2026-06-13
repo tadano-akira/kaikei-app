@@ -37,3 +37,45 @@ export interface Expense {
 
 // 経費入力フォーム用（idや計算値を除いた入力データ）
 export type ExpenseInput = Omit<Expense, 'id' | 'amountWithoutTax' | 'taxAmount' | 'createdAt' | 'updatedAt'>;
+
+
+// ===== ToDo =====
+export type Priority = 'high' | 'medium' | 'low';
+
+export interface Todo {
+  id: string;
+  text: string;
+  priority: Priority;
+  done: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ===== メモ =====
+export type MemoCategory = 'command' | 'script' | 'prompt' | 'other';
+
+export interface Memo {
+  id: string;
+  title: string;
+  category: MemoCategory;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ===== ノートパッド =====
+export interface Notepad {
+  content: string;
+  updatedAt: string;
+}
+
+// ===== 日報 =====
+export interface DailyReport {
+  id: string;
+  date: string; // YYYY-MM-DD
+  done: string;
+  plan: string;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}

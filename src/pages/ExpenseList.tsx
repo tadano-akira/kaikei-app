@@ -9,12 +9,12 @@ interface Props {
 }
 
 export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelect }: Props) => {
-  const budget = 200000; // TODO: 設定画面から取得
+  const budget = 200000;
   const remaining = budget - currentMonthTotal;
   const currentCount = groupedExpenses[0]?.items.length ?? 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
 
       {/* サマリーバー */}
       <div style={summaryBarStyle}>
@@ -30,7 +30,7 @@ export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelec
       </div>
 
       {/* 一覧 */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div>
         {groupedExpenses.length === 0 && (
           <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', marginTop: 60, fontSize: 14 }}>
             経費データがありません
@@ -56,7 +56,6 @@ export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelec
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginTop: 2 }}>
                     {formatDate(expense.date)}
-                    {' '}
                     <span style={{
                       fontSize: 10,
                       padding: '1px 6px',
@@ -67,7 +66,7 @@ export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelec
                       color: expense.expenseType === '固定費'
                         ? 'var(--color-text-warning)'
                         : 'var(--color-text-success)',
-                      marginLeft: 4,
+                      marginLeft: 6,
                     }}>
                       {expense.expenseType}
                     </span>
@@ -87,10 +86,13 @@ export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelec
         ))}
       </div>
 
-      {/* FAB */}
-      <button onClick={onAdd} style={fabStyle} aria-label="新規経費を追加">
-        ＋
-      </button>
+      {/* 追加ボタン */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 0 4px' }}>
+        <button onClick={onAdd} style={fabStyle} aria-label="新規経費を追加">
+          ＋
+        </button>
+      </div>
+
     </div>
   );
 };
@@ -127,14 +129,11 @@ const rowStyle: React.CSSProperties = {
   cursor: 'pointer',
 };
 const fabStyle: React.CSSProperties = {
-  position: 'fixed' as const,
-  bottom: 72,
-  right: 24,
   width: 52,
   height: 52,
   borderRadius: '50%',
-  background: 'var(--color-background-info)',
-  color: 'var(--color-text-info)',
+  background: '#1a1a1a',
+  color: '#ffffff',
   border: 'none',
   fontSize: 24,
   cursor: 'pointer',
