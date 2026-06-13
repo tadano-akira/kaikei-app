@@ -4,13 +4,13 @@ import { formatCurrency, formatDate, formatMonthLabel } from '../constants';
 interface Props {
   groupedExpenses: { month: string; items: Expense[] }[];
   currentMonthTotal: number;
+  budget?: number;
   onAdd: () => void;
   onSelect: (expense: Expense) => void;
 }
 
-export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelect }: Props) => {
-  const budget = 200000;
-  const remaining = budget - currentMonthTotal;
+export const ExpenseList = ({ groupedExpenses, currentMonthTotal, budget = 0, onAdd, onSelect }: Props) => {
+  const remaining = budget > 0 ? budget - currentMonthTotal : null;
   const currentCount = groupedExpenses[0]?.items.length ?? 0;
 
   return (
@@ -22,8 +22,13 @@ export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelec
         <div style={{ width: '0.5px', background: 'var(--color-border-tertiary)' }} />
         <SummaryItem
           label="残予算"
-          value={formatCurrency(remaining)}
-          valueColor={remaining < 0 ? 'var(--color-text-danger)' : 'var(--color-text-success)'}
+          value={remaining !== null ? formatCurrency(remaining) : '－'}
+          valueColor={
+            remaining === null ? 'var(--color-text-tertiary)'
+            : remaining < 0 ? 'var(--color-text-danger)'
+            : 'var(--color-text-success)'
+          }
+          hint={budget > 0 ? `枠 ${formatCurrency(budget)}` : undefined}
         />
         <div style={{ width: '0.5px', background: 'var(--color-border-tertiary)' }} />
         <SummaryItem label="件数" value={`${currentCount}件`} />
@@ -97,10 +102,11 @@ export const ExpenseList = ({ groupedExpenses, currentMonthTotal, onAdd, onSelec
   );
 };
 
-const SummaryItem = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
+const SummaryItem = ({ label, value, valueColor, hint }: { label: string; value: string; valueColor?: string; hint?: string }) => (
   <div style={{ textAlign: 'center', flex: 1 }}>
     <div style={{ fontSize: 13, fontWeight: 500, color: valueColor ?? 'var(--color-text-primary)' }}>{value}</div>
     <div style={{ fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 2 }}>{label}</div>
+    {hint && <div style={{ fontSize: 9, color: 'var(--color-text-tertiary)', marginTop: 1 }}>{hint}</div>}
   </div>
 );
 

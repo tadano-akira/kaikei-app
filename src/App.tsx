@@ -125,7 +125,13 @@ export default function App() {
 
       <main style={mainStyle}>
         {tab === 'expense' && subTab === 'expense' && screen.type === 'list' && (
-          <ExpenseList groupedExpenses={expenseGrouped()} currentMonthTotal={expenseMonthTotal()} onAdd={goExpenseNew} onSelect={goExpenseDetail} />
+          <ExpenseList
+            groupedExpenses={expenseGrouped()}
+            currentMonthTotal={expenseMonthTotal()}
+            budget={Math.round(salesMonthTotal() * settings.targetExpenseRate / 100)}
+            onAdd={goExpenseNew}
+            onSelect={goExpenseDetail}
+          />
         )}
         {tab === 'expense' && subTab === 'expense' && screen.type === 'detail' && (
           <ExpenseDetail expense={screen.expense} onEdit={() => goExpenseEdit(screen.expense)} onDelete={(id) => { removeExpense(id); goExpenseList(); }} onBack={goExpenseList} />
