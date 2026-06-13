@@ -87,16 +87,7 @@ const addBtnStyle: React.CSSProperties = { padding: '7px 14px', borderRadius: 8,
 const cardStyle: React.CSSProperties = { background: 'var(--color-background-secondary)', borderRadius: 10, padding: '14px', marginBottom: 10, border: '0.5px solid var(--color-border-tertiary)' };
 const iconBtnStyle: React.CSSProperties = { background: 'none', border: '0.5px solid var(--color-border-secondary)', borderRadius: 6, padding: '2px 8px', fontSize: 11, cursor: 'pointer', color: 'var(--color-text-secondary)' };
 const overlayStyle: React.CSSProperties = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 };
-const modalInputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '8px 10px',
-  borderRadius: 8,
-  border: '0.5px solid var(--color-border-secondary)',
-  background: '#ffffff',
-  color: '#1a1a1a',
-  fontSize: 14,
-  boxSizing: 'border-box',
-};
+
 const labelStyle: React.CSSProperties = { display: 'block', fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 4, marginTop: 10 };
 const inputStyle: React.CSSProperties = {
   width: '100%',
