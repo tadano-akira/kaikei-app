@@ -34,7 +34,7 @@ type SalesScreen =
 
 export default function App() {
   const { user, loading, login, logout } = useAuth();
-  const { save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, currentMonthTotal: expenseMonthTotal, firestoreLoading: expenseLoading } = useExpenses();
+  const { save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, firestoreLoading: expenseLoading } = useExpenses();
   const { save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales();
   const { settings, loading: settingsLoading, save: saveSettings } = useSettings();
 
@@ -127,7 +127,6 @@ export default function App() {
         {tab === 'expense' && subTab === 'expense' && screen.type === 'list' && (
           <ExpenseList
             groupedExpenses={expenseGrouped()}
-            currentMonthTotal={expenseMonthTotal()}
             budget={Math.round(salesMonthTotal() * settings.targetExpenseRate / 100)}
             onAdd={goExpenseNew}
             onSelect={goExpenseDetail}
@@ -144,7 +143,7 @@ export default function App() {
         )}
 
         {tab === 'expense' && subTab === 'sales' && salesScreen.type === 'list' && (
-          <SalesList groupedSales={salesGrouped()} currentMonthTotal={salesMonthTotal()} onAdd={goSalesNew} onSelect={goSalesDetail} />
+          <SalesList groupedSales={salesGrouped()} onAdd={goSalesNew} onSelect={goSalesDetail} />
         )}
         {tab === 'expense' && subTab === 'sales' && salesScreen.type === 'detail' && (
           <SalesDetail sales={salesScreen.sales} onEdit={() => goSalesEdit(salesScreen.sales)} onDelete={(id) => { removeSales(id); goSalesList(); }} onBack={goSalesList} />
