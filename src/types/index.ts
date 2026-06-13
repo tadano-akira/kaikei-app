@@ -69,6 +69,24 @@ export interface Notepad {
   updatedAt: string;
 }
 
+// ===== 売上 =====
+export type SalesStatus = '見込み' | '請求済' | '入金済';
+
+export interface Sales {
+  id: string;
+  date: string;            // 売上発生日 YYYY-MM-DD
+  paymentDueDate: string;  // 入金予定日 YYYY-MM-DD
+  paymentDate?: string;    // 入金日 YYYY-MM-DD（任意）
+  status: SalesStatus;
+  client: string;          // 請求先
+  amount: number;          // 金額（税込）
+  memo?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type SalesInput = Omit<Sales, 'id' | 'createdAt' | 'updatedAt'>;
+
 // ===== 日報 =====
 export interface DailyReport {
   id: string;
