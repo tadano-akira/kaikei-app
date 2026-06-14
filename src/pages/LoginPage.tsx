@@ -15,10 +15,10 @@ export const LoginPage = ({ onLogin }: Props) => (
     <div style={{ textAlign: 'center' }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>📒</div>
       <h1 style={{ fontSize: 22, fontWeight: 500, color: 'var(--color-text-primary)' }}>
-        簡易会計アプリ
+        ひとり帳
       </h1>
       <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginTop: 8 }}>
-        フリーランス向け経費・売上管理
+        フリーランス向け 簡易会計・売上・ToDo・メモ帳アプリ
       </p>
     </div>
 
