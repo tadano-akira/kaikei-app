@@ -166,11 +166,11 @@ const inputStyle: React.CSSProperties = {
 };
 const errorStyle: React.CSSProperties = { fontSize: 11, color: 'var(--color-text-danger)', marginTop: 4 };
 const saveBtnStyle: React.CSSProperties = {
-  flex: 2, padding: '10px 0', background: 'var(--color-background-info)',
-  color: 'var(--color-text-info)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer',
+  flex: 2, padding: '10px 0', background: '#2563eb',
+  color: '#ffffff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer',
 };
 const cancelBtnStyle: React.CSSProperties = {
-  flex: 1, padding: '10px 0', background: 'var(--color-background-secondary)',
-  color: 'var(--color-text-secondary)', border: '0.5px solid var(--color-border-secondary)',
+  flex: 1, padding: '10px 0', background: '#f0f0f0',
+  color: '#444444', border: '0.5px solid #d0d0d0',
   borderRadius: 8, fontSize: 14, cursor: 'pointer',
 };

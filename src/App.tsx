@@ -196,21 +196,23 @@ const NavItem = ({ icon, label, active, onClick }: { icon: string; label: string
 
 const SubTabItem = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
   <button onClick={onClick} style={{
-    flex: 1, background: 'none', border: 'none', padding: '8px 0', cursor: 'pointer',
+    flex: 1, border: 'none', padding: '8px 0', cursor: 'pointer',
     fontSize: 13, fontWeight: active ? 600 : 400,
-    color: active ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)',
-    borderBottom: active ? '2px solid var(--color-text-primary)' : '2px solid transparent',
+    color: active ? 'var(--color-text-primary, #1a1a1a)' : 'var(--color-text-tertiary, #999)',
+    background: active ? '#d8d8d8' : 'transparent',
+    borderBottom: active ? '2px solid #555' : '2px solid transparent',
+    borderRadius: active ? '4px 4px 0 0' : 0,
   }}>
     {label}
   </button>
 );
 
 const appStyle: React.CSSProperties = { maxWidth: 480, margin: '0 auto', height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--color-background-primary)', position: 'relative' };
-const headerStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary)', minHeight: 48, gap: 8 };
+const headerStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', minHeight: 48, gap: 8 };
 const headerTitleStyle: React.CSSProperties = { flex: 1, fontSize: 15, fontWeight: 500, color: 'var(--color-text-primary)', textAlign: 'center' };
 const backBtnStyle: React.CSSProperties = { background: 'none', border: 'none', fontSize: 18, color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '0 4px' };
 const editIconBtnStyle: React.CSSProperties = { background: 'none', border: 'none', fontSize: 18, color: 'var(--color-text-info)', cursor: 'pointer', padding: '0 4px' };
 const logoutBtnStyle: React.CSSProperties = { background: 'none', border: 'none', fontSize: 12, color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '0 4px' };
-const subTabBarStyle: React.CSSProperties = { display: 'flex', borderBottom: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary)', padding: '0 16px' };
+const subTabBarStyle: React.CSSProperties = { display: 'flex', borderBottom: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', padding: '0 16px' };
 const mainStyle: React.CSSProperties = { flex: 1, overflowY: 'auto', padding: '16px', paddingBottom: 80 };
-const navStyle: React.CSSProperties = { display: 'flex', borderTop: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary)', position: 'sticky', bottom: 0 };
+const navStyle: React.CSSProperties = { display: 'flex', borderTop: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', position: 'sticky', bottom: 0 };

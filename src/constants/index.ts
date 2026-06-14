@@ -7,6 +7,7 @@ export const ACCOUNT_CATEGORIES: AccountCategory[] = [
   '外注費',
   '旅費交通費',
   '接待交際費',
+  '会議費',
   '広告宣伝費',
   '水道光熱費',
   '新聞図書費',

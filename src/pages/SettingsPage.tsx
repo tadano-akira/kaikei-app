@@ -140,12 +140,8 @@ export const SettingsPage = ({ settings, loading, onSave }: Props) => {
         disabled={saving}
         style={{
           ...saveBtnStyle,
-          background: savedMsg
-            ? 'var(--color-background-success)'
-            : 'var(--color-background-info)',
-          color: savedMsg
-            ? 'var(--color-text-success)'
-            : 'var(--color-text-info)',
+          background: savedMsg ? '#dcfce7' : '#2563eb',
+          color: savedMsg ? '#16a34a' : '#ffffff',
         }}
       >
         {saving ? '保存中...' : savedMsg ? '✓ 保存しました' : '保存する'}

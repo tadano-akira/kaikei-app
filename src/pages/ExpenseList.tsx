@@ -53,6 +53,11 @@ export const ExpenseList = ({ groupedExpenses, budget = 0, onAdd, onSelect }: Pr
         <SummaryItem label="件数" value={`${selectedItems.length}件`} />
       </div>
 
+      {/* 追加ボタン */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 0 12px' }}>
+        <button onClick={onAdd} style={fabStyle} aria-label="新規経費を追加">＋</button>
+      </div>
+
       {/* 一覧 */}
       <div>
         {selectedItems.length === 0 ? (
@@ -98,11 +103,6 @@ export const ExpenseList = ({ groupedExpenses, budget = 0, onAdd, onSelect }: Pr
             </div>
           ))
         )}
-      </div>
-
-      {/* 追加ボタン */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 0 4px' }}>
-        <button onClick={onAdd} style={fabStyle} aria-label="新規経費を追加">＋</button>
       </div>
 
     </div>

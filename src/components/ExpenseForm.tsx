@@ -248,8 +248,8 @@ const errorStyle: React.CSSProperties = {
 const saveBtnStyle: React.CSSProperties = {
   flex: 2,
   padding: '10px 0',
-  background: 'var(--color-background-info)',
-  color: 'var(--color-text-info)',
+  background: '#2563eb',
+  color: '#ffffff',
   border: 'none',
   borderRadius: 8,
   fontSize: 14,
@@ -259,9 +259,9 @@ const saveBtnStyle: React.CSSProperties = {
 const cancelBtnStyle: React.CSSProperties = {
   flex: 1,
   padding: '10px 0',
-  background: 'var(--color-background-secondary)',
-  color: 'var(--color-text-secondary)',
-  border: '0.5px solid var(--color-border-secondary)',
+  background: '#f0f0f0',
+  color: '#444444',
+  border: '0.5px solid #d0d0d0',
   borderRadius: 8,
   fontSize: 14,
   cursor: 'pointer',

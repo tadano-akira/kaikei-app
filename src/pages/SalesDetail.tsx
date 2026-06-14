@@ -103,26 +103,26 @@ const detailSectionStyle: React.CSSProperties = {
   border: '0.5px solid var(--color-border-tertiary)', padding: '0 14px',
 };
 const editBtnStyle: React.CSSProperties = {
-  flex: 1, padding: '10px 0', background: 'var(--color-background-secondary)',
-  color: 'var(--color-text-primary)', border: '0.5px solid var(--color-border-secondary)',
+  flex: 1, padding: '10px 0', background: '#f0f0f0',
+  color: '#333333', border: '0.5px solid #d0d0d0',
   borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer',
 };
 const deleteBtnStyle: React.CSSProperties = {
-  flex: 1, padding: '10px 0', background: 'var(--color-background-danger)',
-  color: 'var(--color-text-danger)', border: '0.5px solid var(--color-border-danger)',
+  flex: 1, padding: '10px 0', background: '#fee2e2',
+  color: '#dc2626', border: '0.5px solid #fca5a5',
   borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer',
 };
 const confirmBoxStyle: React.CSSProperties = {
   marginTop: 24, padding: '14px 16px',
-  background: 'var(--color-background-danger)', border: '0.5px solid var(--color-border-danger)', borderRadius: 10,
+  background: '#fee2e2', border: '0.5px solid #fca5a5', borderRadius: 10,
 };
 const cancelBtnStyle: React.CSSProperties = {
-  flex: 1, padding: '8px 0', background: 'var(--color-background-primary)',
-  color: 'var(--color-text-secondary)', border: '0.5px solid var(--color-border-secondary)',
+  flex: 1, padding: '8px 0', background: '#f0f0f0',
+  color: '#444444', border: '0.5px solid #d0d0d0',
   borderRadius: 6, fontSize: 13, cursor: 'pointer',
 };
 const confirmDeleteBtnStyle: React.CSSProperties = {
-  flex: 1, padding: '8px 0', background: 'var(--color-background-danger)',
-  color: 'var(--color-text-danger)', border: '0.5px solid var(--color-border-danger)',
+  flex: 1, padding: '8px 0', background: '#dc2626',
+  color: '#ffffff', border: 'none',
   borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: 'pointer',
 };

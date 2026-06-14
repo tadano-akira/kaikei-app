@@ -58,8 +58,8 @@ export const NotepadPage = () => {
 
 const btnStyle: React.CSSProperties = {
   padding: '6px 12px', borderRadius: 8,
-  background: 'var(--color-background-secondary)',
-  color: 'var(--color-text-primary)',
-  border: '0.5px solid var(--color-border-secondary)',
+  background: '#f0f0f0',
+  color: '#333333',
+  border: '0.5px solid #d0d0d0',
   fontSize: 12, cursor: 'pointer',
 };

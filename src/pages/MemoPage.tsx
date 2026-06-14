@@ -118,7 +118,7 @@ export const MemoPage = () => {
 
 const addBtnStyle: React.CSSProperties = { padding: '7px 14px', borderRadius: 8, background: '#1a1a1a', color: '#fff', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer' };
 const cardStyle: React.CSSProperties = { background: 'var(--color-background-secondary)', borderRadius: 10, padding: '12px 14px', border: '0.5px solid var(--color-border-tertiary)' };
-const iconBtnStyle: React.CSSProperties = { background: 'none', border: '0.5px solid var(--color-border-secondary)', borderRadius: 6, padding: '2px 8px', fontSize: 11, cursor: 'pointer', color: 'var(--color-text-secondary)' };
+const iconBtnStyle: React.CSSProperties = { background: '#f5f5f5', border: '0.5px solid #d0d0d0', borderRadius: 6, padding: '2px 8px', fontSize: 11, cursor: 'pointer', color: '#555555' };
 const overlayStyle: React.CSSProperties = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 };
 const modalStyle: React.CSSProperties = { background: 'var(--color-background-primary, #ffffff)', borderRadius: 14, padding: 20, width: '100%', maxWidth: 480 };
 const modalLabelStyle: React.CSSProperties = { display: 'block', fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 4, marginTop: 10 };
@@ -132,5 +132,5 @@ const modalInputStyle: React.CSSProperties = {
   fontSize: 14,
   boxSizing: 'border-box',
 };
-const cancelBtnStyle: React.CSSProperties = { flex: 1, padding: '9px 0', borderRadius: 8, background: 'var(--color-background-secondary)', color: 'var(--color-text-secondary)', border: '0.5px solid var(--color-border-secondary)', fontSize: 14, cursor: 'pointer' };
+const cancelBtnStyle: React.CSSProperties = { flex: 1, padding: '9px 0', borderRadius: 8, background: '#f0f0f0', color: '#444444', border: '0.5px solid #d0d0d0', fontSize: 14, cursor: 'pointer' };
 const saveBtnStyle: React.CSSProperties = { flex: 2, padding: '9px 0', borderRadius: 8, background: '#1a1a1a', color: '#fff', border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer' };
