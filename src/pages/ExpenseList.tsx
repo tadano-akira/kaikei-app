@@ -47,7 +47,7 @@ export const ExpenseList = ({ groupedExpenses, budget = 0, onAdd, onSelect }: Pr
             : remaining < 0 ? 'var(--color-text-danger)'
             : 'var(--color-text-success)'
           }
-          hint={isCurrentMonth && budget > 0 ? `枠 ${formatCurrency(budget)}` : undefined}
+          hint={isCurrentMonth && budget > 0 ? `枠(${formatCurrency(budget)})` : undefined}
         />
         <div style={{ width: '0.5px', background: 'var(--color-border-tertiary)' }} />
         <SummaryItem label="件数" value={`${selectedItems.length}件`} />
@@ -130,8 +130,7 @@ const navBtnStyle = (disabled: boolean): React.CSSProperties => ({
 const SummaryItem = ({ label, value, valueColor, hint }: { label: string; value: string; valueColor?: string; hint?: string }) => (
   <div style={{ textAlign: 'center', flex: 1 }}>
     <div style={{ fontSize: 13, fontWeight: 500, color: valueColor ?? 'var(--color-text-primary)' }}>{value}</div>
-    <div style={{ fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 2 }}>{label}</div>
-    {hint && <div style={{ fontSize: 9, color: 'var(--color-text-tertiary)', marginTop: 1 }}>{hint}</div>}
+    <div style={{ fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 2 }}>{hint ? `${label}${hint}` : label}</div>
   </div>
 );
 

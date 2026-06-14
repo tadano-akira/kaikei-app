@@ -11,9 +11,9 @@ export default defineConfig({
     VitePWA({
       selfDestroying: true,
       manifest: {
-        name: '簡易会計アプリ',
-        short_name: '会計',
-        description: 'フリーランス向け経費・売上管理アプリ',
+        name: 'ひとり帳',
+        short_name: 'ひとり帳',
+        description: 'フリーランス向け経費・売上・日常ツール管理アプリ',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
