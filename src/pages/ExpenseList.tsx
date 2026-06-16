@@ -47,7 +47,7 @@ export const ExpenseList = ({ groupedExpenses, budget = 0, onAdd, onSelect }: Pr
             : remaining < 0 ? 'var(--color-text-danger)'
             : 'var(--color-text-success)'
           }
-          hint={isCurrentMonth && budget > 0 ? `枠(${formatCurrency(budget)})` : undefined}
+          hint={isCurrentMonth && budget > 0 ? ` (枠 : ${formatCurrency(budget)})` : undefined}
         />
         <div style={{ width: '0.5px', background: 'var(--color-border-tertiary)' }} />
         <SummaryItem label="件数" value={`${selectedItems.length}件`} />
