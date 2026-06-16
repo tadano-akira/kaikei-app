@@ -15,7 +15,14 @@ export const TodoPage = () => {
   const { todos, add, toggle, remove } = useTodos();
   const [text, setText] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>(
+    () => (localStorage.getItem('todo-filter') as Filter) ?? 'all'
+  );
+
+  const changeFilter = (f: Filter) => {
+    setFilter(f);
+    localStorage.setItem('todo-filter', f);
+  };
 
   const filtered = todos.filter(t => {
     if (filter === 'active') return !t.done;
@@ -64,7 +71,7 @@ export const TodoPage = () => {
       {/* フィルター */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
         {(['all', 'active', 'done', 'high'] as Filter[]).map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
+          <button key={f} onClick={() => changeFilter(f)} style={{
             ...filterBtnStyle,
             background: filter === f ? '#1a1a1a' : 'var(--color-background-secondary)',
             color: filter === f ? '#ffffff' : 'var(--color-text-secondary)',
