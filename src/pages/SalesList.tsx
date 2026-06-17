@@ -9,14 +9,19 @@ interface Props {
 }
 
 const STATUS_COLOR: Record<SalesStatus, string> = {
-  '見込み': 'var(--color-text-secondary)',
-  '請求済': 'var(--color-text-warning)',
-  '入金済': 'var(--color-text-success)',
+  '見込み': '#666666',
+  '請求済': '#1d4ed8',
+  '入金済': '#15803d',
 };
-const STATUS_BG: Record<SalesStatus, string> = {
-  '見込み': 'var(--color-background-secondary)',
-  '請求済': 'var(--color-background-warning)',
-  '入金済': 'var(--color-background-success)',
+const STATUS_BADGE_BG: Record<SalesStatus, string> = {
+  '見込み': '#e5e5e5',
+  '請求済': '#dbeafe',
+  '入金済': '#dcfce7',
+};
+const STATUS_ROW_BG: Record<SalesStatus, string> = {
+  '見込み': '#f5f5f5',
+  '請求済': '#eff6ff',
+  '入金済': '#f0fdf4',
 };
 
 const currentYM = new Date().toISOString().slice(0, 7);
@@ -72,18 +77,18 @@ export const SalesList = ({ groupedSales, onAdd, onSelect }: Props) => {
           </div>
         ) : (
           selectedItems.map(s => (
-            <div key={s.id} onClick={() => onSelect(s)} style={rowStyle}>
+            <div key={s.id} onClick={() => onSelect(s)} style={{ ...rowStyle, background: STATUS_ROW_BG[s.status] }}>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 2 }}>
+                <div style={{ fontSize: 11, color: '#888888', marginBottom: 2 }}>
                   {formatDate(s.date)}
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                <div style={{ fontSize: 14, fontWeight: 500, color: '#1a1a1a' }}>
                   {s.client}
                 </div>
                 <div style={{ marginTop: 4 }}>
                   <span style={{
                     fontSize: 10, padding: '1px 6px', borderRadius: 8,
-                    background: STATUS_BG[s.status], color: STATUS_COLOR[s.status],
+                    background: STATUS_BADGE_BG[s.status], color: STATUS_COLOR[s.status],
                   }}>
                     {s.status}
                   </span>
@@ -138,7 +143,8 @@ const summaryBarStyle: React.CSSProperties = {
 };
 const rowStyle: React.CSSProperties = {
   display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-  padding: '12px 4px', borderBottom: '0.5px solid var(--color-border-tertiary)', cursor: 'pointer',
+  padding: '12px 10px', borderBottom: '0.5px solid #e0e0e0', cursor: 'pointer',
+  borderRadius: 8, marginBottom: 4,
 };
 const fabStyle: React.CSSProperties = {
   width: 52, height: 52, borderRadius: '50%',

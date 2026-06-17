@@ -13,7 +13,11 @@ export const LoginPage = ({ onLogin }: Props) => (
     padding: 32,
   }}>
     <div style={{ textAlign: 'center' }}>
-      <div style={{ fontSize: 40, marginBottom: 12 }}>📒</div>
+      <img
+        src={`${import.meta.env.BASE_URL}icons/icon-192.png`}
+        alt="ひとり帳"
+        style={{ width: 80, height: 80, marginBottom: 12, borderRadius: 18 }}
+      />
       <h1 style={{ fontSize: 22, fontWeight: 500, color: 'var(--color-text-primary)' }}>
         ひとり帳
       </h1>

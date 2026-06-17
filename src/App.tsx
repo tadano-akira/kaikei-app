@@ -105,7 +105,11 @@ export default function App() {
         {isInner ? (
           <button onClick={handleBack} style={backBtnStyle}>←</button>
         ) : (
-          <div style={{ width: 32 }} />
+          <img
+            src={`${import.meta.env.BASE_URL}icons/icon-192.png`}
+            alt="ひとり帳"
+            style={{ width: 28, height: 28, borderRadius: 6, flexShrink: 0 }}
+          />
         )}
         <span style={headerTitleStyle}>{headerTitle()}</span>
         {showEditBtn ? (
