@@ -115,8 +115,8 @@ export const TodoPage = () => {
 const sectionHeaderStyle: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 };
 const labelStyle: React.CSSProperties = { fontSize: 11, color: 'var(--color-text-secondary)', letterSpacing: 1 };
 const titleStyle: React.CSSProperties = { fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)' };
-const inputStyle: React.CSSProperties = { flex: 1, padding: '8px 10px', borderRadius: 8, border: '0.5px solid var(--color-border-secondary)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', fontSize: 14 };
-const selectStyle: React.CSSProperties = { padding: '8px 6px', borderRadius: 8, border: '0.5px solid var(--color-border-secondary)', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', fontSize: 13 };
+const inputStyle: React.CSSProperties = { flex: 1, padding: '8px 10px', borderRadius: 8, border: '0.5px solid #d0d0d0', background: '#f5f5f5', color: '#1a1a1a', fontSize: 14 };
+const selectStyle: React.CSSProperties = { padding: '8px 6px', borderRadius: 8, border: '0.5px solid #d0d0d0', background: '#f5f5f5', color: '#1a1a1a', fontSize: 13 };
 const addBtnStyle: React.CSSProperties = { padding: '8px 14px', borderRadius: 8, background: '#1a1a1a', color: '#fff', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', flexShrink: 0 };
 const filterBtnStyle: React.CSSProperties = { padding: '4px 12px', borderRadius: 20, border: 'none', fontSize: 12, cursor: 'pointer' };
 const todoRowStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '0.5px solid var(--color-border-tertiary)' };

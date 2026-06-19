@@ -160,8 +160,8 @@ const reqStyle: React.CSSProperties = { color: 'var(--color-text-danger)', fontS
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '8px 10px', borderRadius: 8,
   border: '0.5px solid var(--color-border-secondary)',
-  background: 'var(--color-background-primary, #ffffff)',
-  color: 'var(--color-text-primary, #1a1a1a)',
+  background: '#f5f5f5',
+  color: '#1a1a1a',
   fontSize: 14, boxSizing: 'border-box',
 };
 const errorStyle: React.CSSProperties = { fontSize: 11, color: 'var(--color-text-danger)', marginTop: 4 };
