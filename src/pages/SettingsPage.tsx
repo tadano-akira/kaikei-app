@@ -1,11 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Settings, ConsumptionTaxCategory } from '../types';
+import { Settings, ConsumptionTaxCategory, Expense, Sales } from '../types';
 
 interface Props {
   settings: Settings;
   loading: boolean;
   onSave: (data: Omit<Settings, 'updatedAt'>) => Promise<void>;
+  expenses: Expense[];
+  sales: Sales[];
 }
+
+const downloadCsv = (filename: string, rows: (string | number | undefined)[][]) => {
+  const bom = '﻿';
+  const csv = bom + rows.map(row =>
+    row.map(cell => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 const CATEGORIES: { value: ConsumptionTaxCategory; label: string }[] = [
   { value: '第1種', label: '第1種 - 卸売業（90%）' },
@@ -16,7 +32,7 @@ const CATEGORIES: { value: ConsumptionTaxCategory; label: string }[] = [
   { value: '第6種', label: '第6種 - 不動産業（40%）' },
 ];
 
-export const SettingsPage = ({ settings, loading, onSave }: Props) => {
+export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Props) => {
   const [targetExpenseRate, setTargetExpenseRate] = useState('');
   const [residentialTaxRate, setResidentialTaxRate] = useState('');
   const [consumptionTaxCategory, setConsumptionTaxCategory] = useState<ConsumptionTaxCategory>('第5種');
@@ -138,6 +154,38 @@ export const SettingsPage = ({ settings, loading, onSave }: Props) => {
         ))}
       </section>
 
+      {/* データエクスポート */}
+      <section style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>データエクスポート</h2>
+        <FieldRow label="経費データ" hint={`${expenses.length}件 / CSV形式`}>
+          <button
+            onClick={() => {
+              const header = ['日付', '勘定科目', '支払先', '税込金額', '税率(%)', '税抜金額', '消費税額', '分類', '利用目的', '証票URL', 'メモ'];
+              const rows = expenses.map(e => [e.date, e.category, e.payee, e.amountWithTax, e.taxRate, e.amountWithoutTax, e.taxAmount, e.expenseType, e.purpose, e.receiptUrl, e.memo]);
+              downloadCsv(`expenses_${new Date().toISOString().slice(0,10)}.csv`, [header, ...rows]);
+            }}
+            style={exportBtnStyle}
+            disabled={expenses.length === 0}
+          >
+            ダウンロード
+          </button>
+        </FieldRow>
+        <div style={dividerStyle} />
+        <FieldRow label="売上データ" hint={`${sales.length}件 / CSV形式`}>
+          <button
+            onClick={() => {
+              const header = ['売上日', '請求先', '金額', 'ステータス', '入金予定日', '入金日', 'メモ'];
+              const rows = sales.map(s => [s.date, s.client, s.amount, s.status, s.paymentDueDate, s.paymentDate, s.memo]);
+              downloadCsv(`sales_${new Date().toISOString().slice(0,10)}.csv`, [header, ...rows]);
+            }}
+            style={exportBtnStyle}
+            disabled={sales.length === 0}
+          >
+            ダウンロード
+          </button>
+        </FieldRow>
+      </section>
+
       {/* 保存ボタン */}
       <button
         onClick={handleSave}
@@ -245,6 +293,16 @@ const selectStyle: React.CSSProperties = {
   color: '#1a1a1a',
   fontSize: 12,
   maxWidth: 180,
+};
+const exportBtnStyle: React.CSSProperties = {
+  padding: '6px 14px',
+  borderRadius: 8,
+  background: '#f0f0f0',
+  color: '#333',
+  border: '0.5px solid #d0d0d0',
+  fontSize: 13,
+  cursor: 'pointer',
+  fontWeight: 500,
 };
 const saveBtnStyle: React.CSSProperties = {
   width: '100%',

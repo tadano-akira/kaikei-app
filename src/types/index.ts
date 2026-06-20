@@ -32,6 +32,7 @@ export interface Expense {
   expenseType: ExpenseType;
   purpose?: string;         // 利用目的（任意）
   memo?: string;            // メモ（任意）
+  receiptUrl?: string;      // 証票URL（任意）
   createdAt: string;
   updatedAt: string;
 }

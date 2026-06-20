@@ -19,6 +19,7 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
   const [expenseType, setExpenseType] = useState<ExpenseType>(initial?.expenseType ?? '変動費');
   const [purpose, setPurpose] = useState(initial?.purpose ?? '');
   const [memo, setMemo] = useState(initial?.memo ?? '');
+  const [receiptUrl, setReceiptUrl] = useState(initial?.receiptUrl ?? '');
   const [showDetail, setShowDetail] = useState(!!(initial?.purpose || initial?.memo));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -35,7 +36,9 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
 
   const handleSave = () => {
     if (!validate()) return;
-    onSave({ date, category, amountWithTax: amount, taxRate, payee, expenseType, purpose, memo });
+    const input: Parameters<typeof onSave>[0] = { date, category, amountWithTax: amount, taxRate, payee, expenseType, purpose, memo };
+    if (receiptUrl.trim()) input.receiptUrl = receiptUrl.trim();
+    onSave(input);
   };
 
   return (
@@ -193,6 +196,16 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
                 placeholder="任意"
                 rows={2}
                 style={{ ...inputStyle, resize: 'vertical' }}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>証票URL</label>
+              <input
+                type="url"
+                value={receiptUrl}
+                onChange={e => setReceiptUrl(e.target.value)}
+                placeholder="https://drive.google.com/..."
+                style={inputStyle}
               />
             </div>
           </div>

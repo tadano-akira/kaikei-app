@@ -179,7 +179,7 @@ export default function App() {
         {tab === 'notepad' && <NotepadPage />}
         {tab === 'daily' && <DailyReportPage />}
         {tab === 'settings' && (
-          <SettingsPage settings={settings} loading={settingsLoading} onSave={saveSettings} />
+          <SettingsPage settings={settings} loading={settingsLoading} onSave={saveSettings} expenses={expenses} sales={sales} />
         )}
       </main>
 
