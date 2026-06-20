@@ -21,7 +21,8 @@ export const SettingsPage = ({ settings, loading, onSave }: Props) => {
   const [residentialTaxRate, setResidentialTaxRate] = useState('');
   const [consumptionTaxCategory, setConsumptionTaxCategory] = useState<ConsumptionTaxCategory>('第5種');
   const [consumptionTaxSpecialRate, setConsumptionTaxSpecialRate] = useState('');
-  const [socialInsurance, setSocialInsurance] = useState('');
+  const [healthInsurance, setHealthInsurance] = useState('');
+  const [pension, setPension] = useState('');
   const [dependentDeduction, setDependentDeduction] = useState('');
   const [lifeInsuranceDeduction, setLifeInsuranceDeduction] = useState('');
   const [idecoDeduction, setIdecoDeduction] = useState('');
@@ -34,7 +35,8 @@ export const SettingsPage = ({ settings, loading, onSave }: Props) => {
     setResidentialTaxRate(settings.residentialTaxRate.toString());
     setConsumptionTaxCategory(settings.consumptionTaxCategory);
     setConsumptionTaxSpecialRate(settings.consumptionTaxSpecialRate.toString());
-    setSocialInsurance(settings.socialInsurance.toString());
+    setHealthInsurance(settings.healthInsurance.toString());
+    setPension(settings.pension.toString());
     setDependentDeduction(settings.dependentDeduction.toString());
     setLifeInsuranceDeduction(settings.lifeInsuranceDeduction.toString());
     setIdecoDeduction(settings.idecoDeduction.toString());
@@ -48,7 +50,8 @@ export const SettingsPage = ({ settings, loading, onSave }: Props) => {
       residentialTaxRate: parseFloat(residentialTaxRate) || 10,
       consumptionTaxCategory,
       consumptionTaxSpecialRate: parseFloat(consumptionTaxSpecialRate) || 0,
-      socialInsurance: parseInt(socialInsurance) || 0,
+      healthInsurance: parseInt(healthInsurance) || 0,
+      pension: parseInt(pension) || 0,
       dependentDeduction: parseInt(dependentDeduction) || 0,
       lifeInsuranceDeduction: parseInt(lifeInsuranceDeduction) || 0,
       idecoDeduction: parseInt(idecoDeduction) || 0,
@@ -119,7 +122,8 @@ export const SettingsPage = ({ settings, loading, onSave }: Props) => {
       <section style={sectionStyle}>
         <h2 style={sectionTitleStyle}>所得控除（年間）</h2>
         {([
-          { label: '社会保険料控除', value: socialInsurance, onChange: setSocialInsurance },
+          { label: '健康保険料', value: healthInsurance, onChange: setHealthInsurance },
+          { label: '年金保険料', value: pension, onChange: setPension },
           { label: '扶養控除', value: dependentDeduction, onChange: setDependentDeduction },
           { label: '生命保険料控除', value: lifeInsuranceDeduction, onChange: setLifeInsuranceDeduction },
           { label: 'iDeCo控除', value: idecoDeduction, onChange: setIdecoDeduction },

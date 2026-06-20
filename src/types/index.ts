@@ -96,7 +96,8 @@ export interface Settings {
   residentialTaxRate: number;        // 住民税率 (%), default 10
   consumptionTaxCategory: ConsumptionTaxCategory;
   consumptionTaxSpecialRate: number; // 消費税特例係数 (0.0〜1.0)
-  socialInsurance: number;           // 社会保険料控除 (円)
+  healthInsurance: number;           // 健康保険料 (円)
+  pension: number;                   // 年金保険料 (円)
   dependentDeduction: number;        // 扶養控除 (円)
   lifeInsuranceDeduction: number;    // 生命保険料控除 (円)
   idecoDeduction: number;            // iDeCo控除 (円)

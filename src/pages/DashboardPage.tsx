@@ -5,6 +5,7 @@ interface Props {
   expenses: Expense[];
   sales: Sales[];
   settings: Settings;
+  onShowTaxDetail: () => void;
 }
 
 const TAX_TABLE = [
@@ -28,7 +29,7 @@ function calcIncomeTax(income: number): number {
   return Math.max(0, Math.round(income * rate - deduction));
 }
 
-export const DashboardPage = ({ expenses, sales, settings }: Props) => {
+export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Props) => {
   const now = new Date();
   const currentYM = now.toISOString().slice(0, 7);
   const currentYear = now.getFullYear();
@@ -52,7 +53,7 @@ export const DashboardPage = ({ expenses, sales, settings }: Props) => {
 
   // 税金試算（年初来実績ベース）
   const totalDeductions =
-    settings.socialInsurance + settings.dependentDeduction +
+    settings.healthInsurance + settings.pension + settings.dependentDeduction +
     settings.lifeInsuranceDeduction + settings.idecoDeduction +
     settings.smallBusinessDeduction;
   const BLUE_DEDUCTION = 650_000;
@@ -128,6 +129,9 @@ export const DashboardPage = ({ expenses, sales, settings }: Props) => {
         <p style={noteStyle}>
           ※ 青色申告控除65万・基礎控除48万・設定の各種控除を反映した概算です。年初来累計の実績に基づきます。
         </p>
+        <button onClick={onShowTaxDetail} style={detailBtnStyle}>
+          計算明細を見る →
+        </button>
       </Card>
 
     </div>
@@ -217,4 +221,9 @@ const noteStyle: React.CSSProperties = {
   color: '#aaa',
   marginTop: 10,
   lineHeight: 1.6,
+};
+const detailBtnStyle: React.CSSProperties = {
+  width: '100%', marginTop: 10, padding: '9px 0',
+  background: '#f0f0f0', color: '#444', border: 'none',
+  borderRadius: 8, fontSize: 13, cursor: 'pointer', fontWeight: 500,
 };

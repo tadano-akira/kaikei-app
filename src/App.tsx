@@ -12,6 +12,7 @@ import { SalesDetail } from './pages/SalesDetail';
 import { SalesForm } from './components/SalesForm';
 import { SettingsPage } from './pages/SettingsPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { TaxDetailPage } from './pages/TaxDetailPage';
 import { LoginPage } from './pages/LoginPage';
 import { TodoPage } from './pages/TodoPage';
 import { MemoPage } from './pages/MemoPage';
@@ -43,6 +44,7 @@ export default function App() {
   const [subTab, setSubTab] = useState<AccountSubTab>('expense');
   const [screen, setScreen] = useState<Screen>({ type: 'list' });
   const [salesScreen, setSalesScreen] = useState<SalesScreen>({ type: 'list' });
+  const [showTaxDetail, setShowTaxDetail] = useState(false);
 
   if (loading) return <Loader text="読み込み中..." />;
   if (!user) return <LoginPage onLogin={login} />;
@@ -62,11 +64,13 @@ export default function App() {
 
   const isExpenseInner = tab === 'expense' && subTab === 'expense' && screen.type !== 'list';
   const isSalesInner = tab === 'expense' && subTab === 'sales' && salesScreen.type !== 'list';
-  const isInner = isExpenseInner || isSalesInner;
+  const isDashboardInner = tab === 'dashboard' && showTaxDetail;
+  const isInner = isExpenseInner || isSalesInner || isDashboardInner;
 
   const handleBack = () => {
     if (isExpenseInner) goExpenseList();
     if (isSalesInner) goSalesList();
+    if (isDashboardInner) setShowTaxDetail(false);
   };
 
   const headerTitle = () => {
@@ -84,7 +88,7 @@ export default function App() {
         if (salesScreen.type === 'edit') return '売上を編集';
       }
     }
-    if (tab === 'dashboard') return '月次ダッシュボード';
+    if (tab === 'dashboard') return showTaxDetail ? '税金試算（詳細）' : '月次ダッシュボード';
     if (tab === 'todo') return 'ToDo';
     if (tab === 'memo') return 'メモ';
     if (tab === 'notepad') return 'テキスト';
@@ -161,8 +165,14 @@ export default function App() {
           <SalesForm initial={salesScreen.sales} onSave={(input) => { updateSales(salesScreen.sales.id, input); goSalesList(); }} onCancel={goSalesList} />
         )}
 
-        {tab === 'dashboard' && (
-          <DashboardPage expenses={expenses} sales={sales} settings={settings} />
+        {tab === 'dashboard' && !showTaxDetail && (
+          <DashboardPage
+            expenses={expenses} sales={sales} settings={settings}
+            onShowTaxDetail={() => setShowTaxDetail(true)}
+          />
+        )}
+        {tab === 'dashboard' && showTaxDetail && (
+          <TaxDetailPage expenses={expenses} sales={sales} settings={settings} />
         )}
         {tab === 'todo' && <TodoPage />}
         {tab === 'memo' && <MemoPage />}
