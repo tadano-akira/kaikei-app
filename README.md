@@ -1,10 +1,12 @@
-# kaikei-app
+# ひとり帳
 
 フリーランス・小規模事業者向けの個人用ツール集。
-経費・売上管理に加え、ToDo・メモ・テキストエディタ・日報機能を統合。
-Google認証でログインし、Firestoreにデータを保存。スマホ・PCどこからでも同じデータにアクセスできる。
+経費・売上管理に加え、月次ダッシュボード・税金試算・ToDo・メモ・テキストエディタ・日報機能を統合。
+Google認証でログインし、Firestoreにデータを保存。スマホ・PCどこからでも同じデータにアクセスできる。PWAに対応しており、ホーム画面へのインストールが可能。
 
 **公開URL**: https://tadano-akira.github.io/kaikei-app/
+
+> **注意**: 現在は個人用途に限定して運用しています。利用希望の方はこのリポジトリを fork し、ご自身の Firebase アカウントを使って環境を構築・ホスティングしてください。セットアップ手順は下記を参照してください。
 
 ---
 
@@ -12,7 +14,12 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 
 | 機能 | 説明 |
 |------|------|
-| 経費管理 | 経費の入力・一覧・編集・削除。税自動計算、固定費/変動費分類 |
+| 経費管理 | 経費の入力・一覧（月別）・編集・削除。税自動計算、固定費/変動費分類、証票URL登録 |
+| 売上管理 | 売上の入力・一覧（月別）・編集・削除。ステータス管理（見込み/請求済/入金済） |
+| 月次ダッシュボード | 今月サマリー（売上・経費・利益・経費予算）・年間累計・税金概算 |
+| 税金試算（詳細） | 所得税・住民税・消費税の計算明細。控除内訳・粗利を表示 |
+| 設定 | 目標経費率・住民税率・消費税区分・各種所得控除を設定 |
+| CSVエクスポート | 経費・売上データをCSV形式でダウンロード（Excel対応） |
 | ToDoリスト | タスク管理。優先度設定・完了管理・フィルター |
 | 簡易メモ | コマンド・スクリプト・プロンプト等をカテゴリ別に保存 |
 | テキストエディタ | シンプルなテキスト入力。クラウド保存・txt出力対応 |
@@ -26,25 +33,26 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 |------|------|
 | フロントエンド | React 18 + TypeScript |
 | ビルド | Vite |
-| UI | CSS Variables（インラインスタイル） |
+| UI | インラインスタイル（CSS Variables） |
 | 認証 | Firebase Authentication（Google） |
 | DB | Firestore |
 | ホスティング | GitHub Pages |
 | CI/CD | GitHub Actions |
+| PWA | vite-plugin-pwa |
 
 ---
 
 ## 実装状況
 
 ### 会計機能
-- [x] 経費入力フォーム（新規・編集）
-- [x] 経費一覧（月別グループ・サマリー表示）
+- [x] 経費入力フォーム（新規・編集・証票URL登録）
+- [x] 経費一覧（月別・サマリー表示）
 - [x] 経費詳細・削除
-- [x] Firestore連携（リアルタイム同期）
-- [ ] 売上管理
-- [ ] ダッシュボード・月次サマリー
-- [ ] 税金試算（所得税・住民税・消費税）
-- [ ] CSVエクスポート
+- [x] 売上管理（ステータス別・月別一覧）
+- [x] 月次ダッシュボード（今月・年間累計）
+- [x] 税金試算（所得税・住民税・消費税・粗利）
+- [x] 設定画面（目標経費率・税率・所得控除）
+- [x] CSVエクスポート（経費・売上）
 
 ### ツール機能
 - [x] ToDoリスト（優先度・フィルター・完了管理）
@@ -56,10 +64,10 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 
 ## セットアップ
 
-### 1. リポジトリをクローン
+### 1. リポジトリを fork & クローン
 
 ```bash
-git clone https://github.com/tadano-akira/kaikei-app.git
+git clone https://github.com/YOUR_USERNAME/kaikei-app.git
 cd kaikei-app
 npm install
 ```
@@ -97,23 +105,23 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=xxx
 VITE_FIREBASE_APP_ID=xxx
 ```
 
-### 4. ローカル起動
+### 4. vite.config.ts の base を修正
+
+```ts
+base: '/your-repo-name/',  // GitHubリポジトリ名に合わせる
+```
+
+### 5. ローカル起動
 
 ```bash
 npm run dev
 ```
 
-### 5. GitHub Pages にデプロイ
+### 6. GitHub Pages にデプロイ
 
 1. GitHubリポジトリの Settings → Pages → Source を「GitHub Actions」に変更
 2. Settings → Secrets に上記の環境変数を6つ登録
 3. `main` ブランチに push すると自動デプロイ
-
-### 6. vite.config.ts の base を修正
-
-```ts
-base: '/your-repo-name/',  // GitHubリポジトリ名に合わせる
-```
 
 ### 7. Firebase の承認済みドメインに追加
 
@@ -129,21 +137,26 @@ your-github-username.github.io
 
 ```
 src/
-├── types/          # TypeScript型定義（Expense・Todo・Memo・DailyReport等）
+├── types/          # TypeScript型定義（Expense・Sales・Settings等）
 ├── constants/      # 定数・税計算・フォーマットユーティリティ
 ├── lib/            # Firebase設定
 ├── hooks/          # カスタムフック
 │   ├── useAuth.ts
 │   ├── useExpenses.ts
+│   ├── useSales.ts
+│   ├── useSettings.ts
 │   ├── useTodos.ts
 │   ├── useMemos.ts
 │   ├── useNotepad.ts
 │   └── useDailyReports.ts
-├── components/     # 共通コンポーネント（ExpenseForm）
+├── components/     # 共通コンポーネント（ExpenseForm・SalesForm）
 ├── pages/          # 画面コンポーネント
 │   ├── LoginPage.tsx
-│   ├── ExpenseList.tsx
-│   ├── ExpenseDetail.tsx
+│   ├── ExpenseList.tsx / ExpenseDetail.tsx
+│   ├── SalesList.tsx / SalesDetail.tsx
+│   ├── DashboardPage.tsx
+│   ├── TaxDetailPage.tsx
+│   ├── SettingsPage.tsx
 │   ├── TodoPage.tsx
 │   ├── MemoPage.tsx
 │   ├── NotepadPage.tsx
@@ -158,6 +171,8 @@ src/
 ```
 users/{userId}/
   ├── expenses/{year}/items/{docId}   # 経費データ
+  ├── sales/{year}/items/{docId}      # 売上データ
+  ├── settings/main                   # 設定データ
   ├── todos/{docId}                   # ToDoデータ
   ├── memos/{docId}                   # メモデータ
   ├── notepad/main                    # テキストエディタ（1ドキュメント）
