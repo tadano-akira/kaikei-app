@@ -92,9 +92,9 @@ export const SalesForm = ({ initial, onSave, onCancel }: Props) => {
           {STATUSES.map(s => (
             <button key={s} onClick={() => setStatus(s)} style={{
               flex: 1, padding: '8px 0', borderRadius: 20, fontSize: 12, cursor: 'pointer',
-              background: status === s ? statusBg[s] : 'var(--color-background-secondary)',
-              color: status === s ? statusColor[s] : 'var(--color-text-secondary)',
-              border: status === s ? `1px solid ${statusColor[s]}` : '0.5px solid var(--color-border-secondary)',
+              background: status === s ? '#3f3f3f' : '#f0f0f0',
+              color: status === s ? '#ffffff' : '#888888',
+              border: 'none',
               fontWeight: status === s ? 600 : 400,
             }}>
               {s}
