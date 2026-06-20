@@ -11,13 +11,14 @@ import { SalesList } from './pages/SalesList';
 import { SalesDetail } from './pages/SalesDetail';
 import { SalesForm } from './components/SalesForm';
 import { SettingsPage } from './pages/SettingsPage';
+import { DashboardPage } from './pages/DashboardPage';
 import { LoginPage } from './pages/LoginPage';
 import { TodoPage } from './pages/TodoPage';
 import { MemoPage } from './pages/MemoPage';
 import { NotepadPage } from './pages/NotepadPage';
 import { DailyReportPage } from './pages/DailyReportPage';
 
-type Tab = 'expense' | 'todo' | 'memo' | 'notepad' | 'daily' | 'settings';
+type Tab = 'expense' | 'dashboard' | 'todo' | 'memo' | 'notepad' | 'daily' | 'settings';
 type AccountSubTab = 'expense' | 'sales';
 
 type Screen =
@@ -34,8 +35,8 @@ type SalesScreen =
 
 export default function App() {
   const { user, loading, login, logout } = useAuth();
-  const { save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, firestoreLoading: expenseLoading } = useExpenses();
-  const { save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales();
+  const { expenses, save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, firestoreLoading: expenseLoading } = useExpenses();
+  const { sales, save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales();
   const { settings, loading: settingsLoading, save: saveSettings } = useSettings();
 
   const [tab, setTab] = useState<Tab>('expense');
@@ -83,6 +84,7 @@ export default function App() {
         if (salesScreen.type === 'edit') return '売上を編集';
       }
     }
+    if (tab === 'dashboard') return '月次ダッシュボード';
     if (tab === 'todo') return 'ToDo';
     if (tab === 'memo') return 'メモ';
     if (tab === 'notepad') return 'テキスト';
@@ -159,6 +161,9 @@ export default function App() {
           <SalesForm initial={salesScreen.sales} onSave={(input) => { updateSales(salesScreen.sales.id, input); goSalesList(); }} onCancel={goSalesList} />
         )}
 
+        {tab === 'dashboard' && (
+          <DashboardPage expenses={expenses} sales={sales} settings={settings} />
+        )}
         {tab === 'todo' && <TodoPage />}
         {tab === 'memo' && <MemoPage />}
         {tab === 'notepad' && <NotepadPage />}
@@ -170,6 +175,7 @@ export default function App() {
 
       <nav style={navStyle}>
         <NavItem icon="💴" label="会計" active={tab === 'expense'} onClick={() => { setTab('expense'); }} />
+        <NavItem icon="📊" label="集計" active={tab === 'dashboard'} onClick={() => setTab('dashboard')} />
         <NavItem icon="☑" label="ToDo" active={tab === 'todo'} onClick={() => setTab('todo')} />
         <NavItem icon="📝" label="メモ" active={tab === 'memo'} onClick={() => setTab('memo')} />
         <NavItem icon="📄" label="テキスト" active={tab === 'notepad'} onClick={() => setTab('notepad')} />
