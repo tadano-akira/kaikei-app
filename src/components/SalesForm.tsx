@@ -144,16 +144,6 @@ export const SalesForm = ({ initial, onSave, onCancel }: Props) => {
   );
 };
 
-const statusBg: Record<SalesStatus, string> = {
-  '見込み': 'var(--color-background-secondary)',
-  '請求済': 'var(--color-background-warning)',
-  '入金済': 'var(--color-background-success)',
-};
-const statusColor: Record<SalesStatus, string> = {
-  '見込み': 'var(--color-text-secondary)',
-  '請求済': 'var(--color-text-warning)',
-  '入金済': 'var(--color-text-success)',
-};
 
 const labelStyle: React.CSSProperties = { display: 'block', fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 4 };
 const reqStyle: React.CSSProperties = { color: 'var(--color-text-danger)', fontSize: 11 };
