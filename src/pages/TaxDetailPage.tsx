@@ -68,6 +68,9 @@ export const TaxDetailPage = ({ expenses, sales, settings }: Props) => {
 
   const totalTax = incomeTax + residentialTax + consumptionTax;
 
+  // 粗利 = 年間売上 - 社会保険料 - 合計税額
+  const grossProfit = ytdSales - socialInsurance - totalTax;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
@@ -150,6 +153,26 @@ export const TaxDetailPage = ({ expenses, sales, settings }: Props) => {
         </div>
       </div>
 
+      {/* 粗利 */}
+      <div style={grossProfitBoxStyle}>
+        <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>
+          粗利（年間売上 － 社会保険料 － 税金）
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: 12, color: '#888', lineHeight: 1.6 }}>
+            <div>{formatCurrency(ytdSales)}</div>
+            <div>－ {formatCurrency(socialInsurance)}（社会保険料）</div>
+            <div>－ {formatCurrency(totalTax)}（合計税額）</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 11, color: '#888' }}>粗利</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: grossProfit < 0 ? '#dc2626' : '#15803d' }}>
+              {formatCurrency(grossProfit)}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <p style={noteStyle}>
         ※ 年初来の実績に基づく概算です。青色申告65万控除・基礎控除48万を含みます。
         確定申告は e-Tax でご確認ください。
@@ -202,6 +225,9 @@ const taxableBoxStyle: React.CSSProperties = {
 };
 const totalBoxStyle: React.CSSProperties = {
   background: '#f0f0f0', borderRadius: 12, padding: '16px',
+};
+const grossProfitBoxStyle: React.CSSProperties = {
+  background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '14px 16px',
 };
 const noteStyle: React.CSSProperties = {
   fontSize: 10, color: '#aaa', lineHeight: 1.6, marginBottom: 8,

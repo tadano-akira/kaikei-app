@@ -194,7 +194,7 @@ const YenInput = ({ value, onChange }: { value: string; onChange: (v: string) =>
       onChange={e => onChange(e.target.value)}
       min={0} step={1000}
       placeholder="0"
-      style={numInputStyle}
+      style={yenInputStyle}
     />
   </div>
 );
@@ -216,6 +216,16 @@ const dividerStyle: React.CSSProperties = {
   height: '0.5px',
   background: 'var(--color-border-tertiary)',
   margin: '0 -16px',
+};
+const yenInputStyle: React.CSSProperties = {
+  width: 140,
+  padding: '6px 8px',
+  borderRadius: 8,
+  border: '0.5px solid #d0d0d0',
+  background: '#f5f5f5',
+  color: '#1a1a1a',
+  fontSize: 14,
+  textAlign: 'right',
 };
 const numInputStyle: React.CSSProperties = {
   width: 80,
