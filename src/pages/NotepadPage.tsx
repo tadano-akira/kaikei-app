@@ -20,10 +20,10 @@ export const NotepadPage = ({ isGuest }: { isGuest: boolean }) => {
           <div style={{ fontSize: 18, fontWeight: 500 }}>テキスト入力</div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: saved ? 'var(--color-text-success)' : 'var(--color-text-warning)' }}>
-            {saved ? '保存済み' : '未保存'}
+          <span style={saved ? savedBadgeStyle : unsavedBadgeStyle}>
+            {saved ? '✓ 保存済み' : '⚠ 未保存'}
           </span>
-          <button onClick={save} style={btnStyle}>保存</button>
+          <button onClick={save} style={saved ? btnStyle : saveBtnUnsavedStyle}>保存</button>
           <button onClick={handleDownload} style={btnStyle}>DL (.txt)</button>
         </div>
       </div>
@@ -56,10 +56,33 @@ export const NotepadPage = ({ isGuest }: { isGuest: boolean }) => {
   );
 };
 
+const savedBadgeStyle: React.CSSProperties = {
+  fontSize: 12, fontWeight: 500,
+  color: '#16a34a',
+  background: '#f0fdf4',
+  border: '0.5px solid #86efac',
+  borderRadius: 6, padding: '4px 10px',
+};
+
+const unsavedBadgeStyle: React.CSSProperties = {
+  fontSize: 12, fontWeight: 700,
+  color: '#ffffff',
+  background: '#dc2626',
+  borderRadius: 6, padding: '4px 10px',
+};
+
 const btnStyle: React.CSSProperties = {
   padding: '6px 12px', borderRadius: 8,
   background: '#f0f0f0',
   color: '#333333',
   border: '0.5px solid #d0d0d0',
   fontSize: 12, cursor: 'pointer',
+};
+
+const saveBtnUnsavedStyle: React.CSSProperties = {
+  padding: '6px 12px', borderRadius: 8,
+  background: '#1a1a1a',
+  color: '#ffffff',
+  border: 'none',
+  fontSize: 12, fontWeight: 700, cursor: 'pointer',
 };
