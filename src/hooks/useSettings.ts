@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Settings } from '../types';
 
 const DEFAULT: Settings = {
@@ -19,11 +20,17 @@ const DEFAULT: Settings = {
 
 const getRef = (uid: string) => doc(db, 'users', uid, 'settings', 'main');
 
-export const useSettings = () => {
+export const useSettings = (isGuest: boolean) => {
   const [settings, setSettings] = useState<Settings>(DEFAULT);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isGuest) {
+      setSettings(localStore.getItem<Settings>(LOCAL_KEYS.settings, DEFAULT));
+      setLoading(false);
+      return;
+    }
+
     const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) { setLoading(false); return; }
       const snap = await getDoc(getRef(user.uid));
@@ -31,12 +38,19 @@ export const useSettings = () => {
       setLoading(false);
     });
     return unsub;
-  }, []);
+  }, [isGuest]);
 
   const save = async (data: Omit<Settings, 'updatedAt'>): Promise<void> => {
+    const record = { ...data, updatedAt: new Date().toISOString() };
+
+    if (isGuest) {
+      localStore.setItem(LOCAL_KEYS.settings, record);
+      setSettings(record);
+      return;
+    }
+
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    const record = { ...data, updatedAt: new Date().toISOString() };
     await setDoc(getRef(uid), record);
     setSettings(record);
   };

@@ -4,10 +4,11 @@ import {
   onSnapshot, query, orderBy
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Expense, ExpenseInput } from '../types';
 import { calcTax } from '../constants';
 
-export const useExpenses = () => {
+export const useExpenses = (isGuest: boolean) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [firestoreLoading, setFirestoreLoading] = useState(true);
 
@@ -17,6 +18,12 @@ export const useExpenses = () => {
   };
 
   useEffect(() => {
+    if (isGuest) {
+      setExpenses(localStore.getList<Expense>(LOCAL_KEYS.expenses));
+      setFirestoreLoading(false);
+      return;
+    }
+
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!user) {
         setFirestoreLoading(false);
@@ -24,14 +31,12 @@ export const useExpenses = () => {
       }
 
       const uid = user.uid;
-      console.log('uid:', uid);
       const year = new Date().getFullYear().toString();
       const ref = collection(db, 'users', uid, 'expenses', year, 'items');
       const q = query(ref, orderBy('date', 'desc'));
 
       const unsubscribeSnapshot = onSnapshot(q,
         (snapshot) => {
-          console.log('snapshot件数:', snapshot.docs.length);
           const items: Expense[] = snapshot.docs.map(d => ({
             id: d.id,
             ...d.data(),
@@ -49,13 +54,35 @@ export const useExpenses = () => {
     });
 
     return unsubscribeAuth;
-  }, []);
+  }, [isGuest]);
+
+  // ゲストモード: state更新とlocalStorage保存をまとめて行う
+  const persistLocal = (list: Expense[]) => {
+    // 経費一覧は日付降順で表示するため、保存時にも揃えておく
+    const sorted = [...list].sort((a, b) => b.date.localeCompare(a.date));
+    setExpenses(sorted);
+    localStore.setList(LOCAL_KEYS.expenses, sorted);
+  };
 
   const save = async (input: ExpenseInput): Promise<void> => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) throw new Error('未ログイン');
     const { amountWithoutTax, taxAmount } = calcTax(input.amountWithTax, input.taxRate);
     const now = new Date().toISOString();
+
+    if (isGuest) {
+      const item: Expense = {
+        ...input,
+        id: crypto.randomUUID(),
+        amountWithoutTax,
+        taxAmount,
+        createdAt: now,
+        updatedAt: now,
+      };
+      persistLocal([item, ...expenses]);
+      return;
+    }
+
+    const uid = auth.currentUser?.uid;
+    if (!uid) throw new Error('未ログイン');
     await addDoc(getCollectionRef(uid), {
       ...input,
       amountWithoutTax,
@@ -66,19 +93,36 @@ export const useExpenses = () => {
   };
 
   const update = async (id: string, input: ExpenseInput): Promise<void> => {
+    const { amountWithoutTax, taxAmount } = calcTax(input.amountWithTax, input.taxRate);
+    const now = new Date().toISOString();
+
+    if (isGuest) {
+      const original = expenses.find(e => e.id === id);
+      persistLocal(expenses.map(e => e.id === id
+        ? { ...e, ...input, amountWithoutTax, taxAmount, updatedAt: now }
+        : e
+      ));
+      if (!original) console.warn(`ゲストデータ更新: id=${id} が見つかりませんでした`);
+      return;
+    }
+
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
-    const { amountWithoutTax, taxAmount } = calcTax(input.amountWithTax, input.taxRate);
     const ref = doc(getCollectionRef(uid), id);
     await updateDoc(ref, {
       ...input,
       amountWithoutTax,
       taxAmount,
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
     });
   };
 
   const remove = async (id: string): Promise<void> => {
+    if (isGuest) {
+      persistLocal(expenses.filter(e => e.id !== id));
+      return;
+    }
+
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
     const ref = doc(getCollectionRef(uid), id);

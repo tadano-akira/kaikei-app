@@ -4,6 +4,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Sales, SalesInput } from '../types';
 
 const getRef = (uid: string) => {
@@ -11,11 +12,17 @@ const getRef = (uid: string) => {
   return collection(db, 'users', uid, 'sales', year, 'items');
 };
 
-export const useSales = () => {
+export const useSales = (isGuest: boolean) => {
   const [sales, setSales] = useState<Sales[]>([]);
   const [firestoreLoading, setFirestoreLoading] = useState(true);
 
   useEffect(() => {
+    if (isGuest) {
+      setSales(localStore.getList<Sales>(LOCAL_KEYS.sales));
+      setFirestoreLoading(false);
+      return;
+    }
+
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!user) { setFirestoreLoading(false); return; }
 
@@ -40,12 +47,25 @@ export const useSales = () => {
     });
 
     return unsubscribeAuth;
-  }, []);
+  }, [isGuest]);
+
+  const persistLocal = (list: Sales[]) => {
+    const sorted = [...list].sort((a, b) => b.date.localeCompare(a.date));
+    setSales(sorted);
+    localStore.setList(LOCAL_KEYS.sales, sorted);
+  };
 
   const save = async (input: SalesInput): Promise<void> => {
+    const now = new Date().toISOString();
+
+    if (isGuest) {
+      const item: Sales = { ...input, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
+      persistLocal([item, ...sales]);
+      return;
+    }
+
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
-    const now = new Date().toISOString();
     const data = Object.fromEntries(
       Object.entries({ ...input, createdAt: now, updatedAt: now }).filter(([, v]) => v !== undefined)
     );
@@ -53,15 +73,27 @@ export const useSales = () => {
   };
 
   const update = async (id: string, input: SalesInput): Promise<void> => {
+    const now = new Date().toISOString();
+
+    if (isGuest) {
+      persistLocal(sales.map(s => s.id === id ? { ...s, ...input, updatedAt: now } : s));
+      return;
+    }
+
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
     const data = Object.fromEntries(
-      Object.entries({ ...input, updatedAt: new Date().toISOString() }).filter(([, v]) => v !== undefined)
+      Object.entries({ ...input, updatedAt: now }).filter(([, v]) => v !== undefined)
     );
     await updateDoc(doc(getRef(uid), id), data);
   };
 
   const remove = async (id: string): Promise<void> => {
+    if (isGuest) {
+      persistLocal(sales.filter(s => s.id !== id));
+      return;
+    }
+
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
     await deleteDoc(doc(getRef(uid), id));
