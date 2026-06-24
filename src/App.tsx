@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Expense, Sales } from './types';
 import { useExpenses } from './hooks/useExpenses';
 import { useSales } from './hooks/useSales';
@@ -18,6 +18,9 @@ import { TodoPage } from './pages/TodoPage';
 import { MemoPage } from './pages/MemoPage';
 import { NotepadPage } from './pages/NotepadPage';
 import { DailyReportPage } from './pages/DailyReportPage';
+import { MigrationDialog } from './components/MigrationDialog';
+import { hasGuestData, getGuestDataSummary, GuestDataSummary } from './lib/localStore';
+import { migrateGuestDataToFirestore, discardGuestData } from './lib/migration';
 
 type Tab = 'expense' | 'dashboard' | 'todo' | 'memo' | 'notepad' | 'daily' | 'settings';
 type AccountSubTab = 'expense' | 'sales';
@@ -35,10 +38,12 @@ type SalesScreen =
   | { type: 'edit'; sales: Sales };
 
 export default function App() {
-  const { user, loading, login, logout } = useAuth();
-  const { expenses, save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, firestoreLoading: expenseLoading } = useExpenses();
-  const { sales, save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales();
-  const { settings, loading: settingsLoading, save: saveSettings } = useSettings();
+  const { user, authMode, authChecked, login, logout, enterGuestMode } = useAuth();
+  const isGuest = authMode === 'guest';
+
+  const { expenses, save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, firestoreLoading: expenseLoading } = useExpenses(isGuest);
+  const { sales, save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales(isGuest);
+  const { settings, loading: settingsLoading, save: saveSettings } = useSettings(isGuest);
 
   const [tab, setTab] = useState<Tab>('expense');
   const [subTab, setSubTab] = useState<AccountSubTab>('expense');
@@ -46,8 +51,50 @@ export default function App() {
   const [salesScreen, setSalesScreen] = useState<SalesScreen>({ type: 'list' });
   const [showTaxDetail, setShowTaxDetail] = useState(false);
 
-  if (loading) return <Loader text="読み込み中..." />;
-  if (!user) return <LoginPage onLogin={login} />;
+  // 移行ダイアログ関連の状態
+  const [migrationSummary, setMigrationSummary] = useState<GuestDataSummary | null>(null);
+  const [migrating, setMigrating] = useState(false);
+  const [migrationError, setMigrationError] = useState<string | null>(null);
+  const wasGuestRef = useRef(false);
+
+  // ゲストモード(guest) -> ログイン成功(loggedIn) への遷移を検知して、
+  // ゲストデータが残っていれば移行確認ダイアログを表示する。
+  useEffect(() => {
+    if (authMode === 'guest') {
+      wasGuestRef.current = true;
+    }
+    if (authMode === 'loggedIn' && wasGuestRef.current) {
+      wasGuestRef.current = false;
+      if (hasGuestData()) {
+        setMigrationSummary(getGuestDataSummary());
+      }
+    }
+  }, [authMode]);
+
+  const handleMigrate = async () => {
+    if (!user) return;
+    setMigrating(true);
+    setMigrationError(null);
+    try {
+      await migrateGuestDataToFirestore(user.uid);
+      setMigrationSummary(null);
+    } catch (e) {
+      console.error('ゲストデータ移行エラー:', e);
+      setMigrationError('移行に失敗しました。通信環境を確認して、もう一度お試しください。');
+    } finally {
+      setMigrating(false);
+    }
+  };
+
+  const handleDiscard = () => {
+    discardGuestData();
+    setMigrationSummary(null);
+  };
+
+  // 初回のFirebase認証確認が終わっていない間はローディング表示
+  if (!authChecked) return <Loader text="読み込み中..." />;
+  // 確認済みで未ログイン・ゲストでもない場合はログイン画面を表示
+  if (authMode === 'loading') return <LoginPage onLogin={login} onGuest={enterGuestMode} />;
   if (tab === 'expense' && (expenseLoading || salesLoading)) return <Loader text="データを読み込み中..." />;
 
   // 経費ナビゲーション
@@ -120,10 +167,18 @@ export default function App() {
         <span style={headerTitleStyle}>{headerTitle()}</span>
         {showEditBtn ? (
           <button onClick={handleEditBtn} style={editIconBtnStyle}>✎</button>
+        ) : isGuest ? (
+          <button onClick={login} style={logoutBtnStyle}>ログイン</button>
         ) : (
           <button onClick={logout} style={logoutBtnStyle}>ログアウト</button>
         )}
       </header>
+
+      {isGuest && (
+        <div style={guestBannerStyle}>
+          ゲストモードで利用中（データはこの端末のみに保存されます）
+        </div>
+      )}
 
       {/* 会計サブタブ */}
       {tab === 'expense' && !isInner && (
@@ -174,10 +229,10 @@ export default function App() {
         {tab === 'dashboard' && showTaxDetail && (
           <TaxDetailPage expenses={expenses} sales={sales} settings={settings} />
         )}
-        {tab === 'todo' && <TodoPage />}
-        {tab === 'memo' && <MemoPage />}
-        {tab === 'notepad' && <NotepadPage />}
-        {tab === 'daily' && <DailyReportPage />}
+        {tab === 'todo' && <TodoPage isGuest={isGuest} />}
+        {tab === 'memo' && <MemoPage isGuest={isGuest} />}
+        {tab === 'notepad' && <NotepadPage isGuest={isGuest} />}
+        {tab === 'daily' && <DailyReportPage isGuest={isGuest} />}
         {tab === 'settings' && (
           <SettingsPage settings={settings} loading={settingsLoading} onSave={saveSettings} expenses={expenses} sales={sales} />
         )}
@@ -192,6 +247,16 @@ export default function App() {
         <NavItem icon="📋" label="日報" active={tab === 'daily'} onClick={() => setTab('daily')} />
         <NavItem icon="⚙" label="設定" active={tab === 'settings'} onClick={() => setTab('settings')} />
       </nav>
+
+      {migrationSummary && (
+        <MigrationDialog
+          summary={migrationSummary}
+          migrating={migrating}
+          error={migrationError}
+          onMigrate={handleMigrate}
+          onDiscard={handleDiscard}
+        />
+      )}
     </div>
   );
 }
@@ -234,5 +299,6 @@ const backBtnStyle: React.CSSProperties = { background: 'none', border: 'none', 
 const editIconBtnStyle: React.CSSProperties = { background: 'none', border: 'none', fontSize: 18, color: 'var(--color-text-info)', cursor: 'pointer', padding: '0 4px' };
 const logoutBtnStyle: React.CSSProperties = { background: 'none', border: 'none', fontSize: 12, color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '0 4px' };
 const subTabBarStyle: React.CSSProperties = { display: 'flex', borderBottom: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', padding: '0 16px' };
+const guestBannerStyle: React.CSSProperties = { padding: '6px 16px', fontSize: 11, textAlign: 'center', background: '#fff7e6', color: '#9a6700', borderBottom: '0.5px solid #f0d9a0' };
 const mainStyle: React.CSSProperties = { flex: 1, overflowY: 'auto', padding: '16px', paddingBottom: 80 };
 const navStyle: React.CSSProperties = { display: 'flex', borderTop: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', position: 'sticky', bottom: 0 };

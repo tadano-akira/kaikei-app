@@ -1,8 +1,9 @@
 interface Props {
   onLogin: () => void;
+  onGuest: () => void;
 }
 
-export const LoginPage = ({ onLogin }: Props) => (
+export const LoginPage = ({ onLogin, onGuest }: Props) => (
   <div style={{
     height: '100dvh',
     display: 'flex',
@@ -48,8 +49,22 @@ export const LoginPage = ({ onLogin }: Props) => (
       Google でログイン
     </button>
 
+    <button onClick={onGuest} style={{
+      background: 'none',
+      border: 'none',
+      fontSize: 13,
+      color: 'var(--color-text-secondary)',
+      cursor: 'pointer',
+      textDecoration: 'underline',
+      padding: '4px 8px',
+    }}>
+      ログインせずに試す
+    </button>
+
     <p style={{ fontSize: 11, color: 'var(--color-text-tertiary)', textAlign: 'center' }}>
       ログインすることで、データがクラウドに安全に保存されます
+      <br />
+      （「ログインせずに試す」はこの端末のみにデータが保存されます）
     </p>
   </div>
 );

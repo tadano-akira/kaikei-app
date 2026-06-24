@@ -5,8 +5,8 @@ import { DailyReport } from '../types';
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const formatDate = (s: string) => { const [y, m, d] = s.split('-'); return `${y}年${m}月${d}日`; };
 
-export const DailyReportPage = () => {
-  const { reports, save, remove } = useDailyReports();
+export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
+  const { reports, save, remove } = useDailyReports(isGuest);
   const [modal, setModal] = useState(false);
   const [editTarget, setEditTarget] = useState<DailyReport | null>(null);
   const [date, setDate] = useState(todayStr());

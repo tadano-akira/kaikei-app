@@ -1,7 +1,7 @@
 import { useNotepad } from '../hooks/useNotepad';
 
-export const NotepadPage = () => {
-  const { content, saved, onChange, save } = useNotepad();
+export const NotepadPage = ({ isGuest }: { isGuest: boolean }) => {
+  const { content, saved, onChange, save } = useNotepad(isGuest);
 
   const handleDownload = () => {
     const blob = new Blob([content], { type: 'text/plain' });

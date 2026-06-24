@@ -5,8 +5,8 @@ import { Memo, MemoCategory } from '../types';
 const CAT_LABEL: Record<MemoCategory, string> = { command: 'コマンド', script: 'スクリプト', prompt: 'プロンプト', other: 'その他' };
 type Filter = 'all' | MemoCategory;
 
-export const MemoPage = () => {
-  const { memos, add, update, remove } = useMemos();
+export const MemoPage = ({ isGuest }: { isGuest: boolean }) => {
+  const { memos, add, update, remove } = useMemos(isGuest);
   const [filter, setFilter] = useState<Filter>('all');
   const [modal, setModal] = useState(false);
   const [editTarget, setEditTarget] = useState<Memo | null>(null);

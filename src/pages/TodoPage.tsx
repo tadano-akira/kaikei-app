@@ -11,8 +11,8 @@ const PRIORITY_COLOR: Record<Priority, string> = {
 
 type Filter = 'all' | 'active' | 'done' | 'high';
 
-export const TodoPage = () => {
-  const { todos, add, toggle, remove } = useTodos();
+export const TodoPage = ({ isGuest }: { isGuest: boolean }) => {
+  const { todos, add, toggle, remove } = useTodos(isGuest);
   const [text, setText] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [filter, setFilter] = useState<Filter>(
