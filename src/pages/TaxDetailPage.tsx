@@ -25,8 +25,25 @@ const PURCHASE_RATES: Record<string, number> = {
 export const TaxDetailPage = ({ expenses, sales, settings }: Props) => {
   // 年初来累計
   const ytdSales = sales.reduce((sum, s) => sum + s.amount, 0);
-  const ytdExp   = expenses.reduce((sum, e) => sum + e.amountWithTax, 0);
-  const businessIncome = ytdSales - ytdExp;
+  const ytdExpActual = expenses.reduce((sum, e) => sum + e.amountWithTax, 0);
+
+  // 見込経費：経費未入力月の売上×目標経費率
+  const allYMs = new Set([
+    ...sales.map(s => s.date.slice(0, 7)),
+    ...expenses.map(e => e.date.slice(0, 7)),
+  ]);
+  let ytdExpProjected = 0;
+  for (const ym of allYMs) {
+    const hasExp = expenses.some(e => e.date.startsWith(ym));
+    if (!hasExp) {
+      const monthSales = sales
+        .filter(s => s.date.startsWith(ym))
+        .reduce((sum, s) => sum + s.amount, 0);
+      ytdExpProjected += Math.round(monthSales * settings.targetExpenseRate / 100);
+    }
+  }
+  const ytdExpCombined = ytdExpActual + ytdExpProjected;
+  const businessIncome = ytdSales - ytdExpCombined;
 
   // 控除明細
   const BLUE_DEDUCTION  = 650_000;
@@ -77,7 +94,14 @@ export const TaxDetailPage = ({ expenses, sales, settings }: Props) => {
       {/* 収入と経費 */}
       <Card title="収入と経費（年初来累計）">
         <CalcRow label="年間売上" value={formatCurrency(ytdSales)} />
-        <CalcRow label="年間経費" value={`－${formatCurrency(ytdExp)}`} valueColor="#dc2626" />
+        <CalcRow label="年間経費（実額）" value={`－${formatCurrency(ytdExpActual)}`} valueColor="#dc2626" />
+        {ytdExpProjected > 0 && (
+          <CalcRow
+            label={`見込経費（未入力月・${settings.targetExpenseRate}%）`}
+            value={`－${formatCurrency(ytdExpProjected)}`}
+            valueColor="#f97316"
+          />
+        )}
         <SumRow label="事業所得" value={formatCurrency(businessIncome)} color={businessIncome < 0 ? '#dc2626' : '#1a1a1a'} />
       </Card>
 
@@ -175,6 +199,7 @@ export const TaxDetailPage = ({ expenses, sales, settings }: Props) => {
 
       <p style={noteStyle}>
         ※ 年初来の実績に基づく概算です。青色申告65万控除・基礎控除48万を含みます。
+        経費未入力月は売上×目標経費率（{settings.targetExpenseRate}%）で見込み計上しています。
         確定申告は e-Tax でご確認ください。
       </p>
     </div>
