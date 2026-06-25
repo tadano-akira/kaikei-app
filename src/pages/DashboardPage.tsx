@@ -48,8 +48,25 @@ export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Pr
 
   // 年間累計 (YTD)
   const ytdSales = sales.reduce((sum, s) => sum + s.amount, 0);
-  const ytdExp = expenses.reduce((sum, e) => sum + e.amountWithTax, 0);
-  const ytdProfit = ytdSales - ytdExp;
+
+  // 経費：実データがある月は実額、ない月は売上×目標経費率で見込み
+  const allYMs = new Set([
+    ...sales.map(s => s.date.slice(0, 7)),
+    ...expenses.map(e => e.date.slice(0, 7)),
+  ]);
+  let ytdExpCombined = 0;
+  for (const ym of allYMs) {
+    const monthExpenses = expenses.filter(e => e.date.startsWith(ym));
+    if (monthExpenses.length > 0) {
+      ytdExpCombined += monthExpenses.reduce((sum, e) => sum + e.amountWithTax, 0);
+    } else {
+      const monthSales = sales
+        .filter(s => s.date.startsWith(ym))
+        .reduce((sum, s) => sum + s.amount, 0);
+      ytdExpCombined += Math.round(monthSales * settings.targetExpenseRate / 100);
+    }
+  }
+  const ytdProfit = ytdSales - ytdExpCombined;
 
   // 税金試算（年初来実績ベース）
   const totalDeductions =
@@ -101,7 +118,7 @@ export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Pr
         <CardTitle>{currentYear}年 年初来累計</CardTitle>
         <ThreeCol items={[
           { label: '累計売上', value: formatCurrency(ytdSales) },
-          { label: '累計経費', value: formatCurrency(ytdExp) },
+          { label: '累計経費(実額+見込額)', value: formatCurrency(ytdExpCombined) },
           { label: '累計利益', value: formatCurrency(ytdProfit), color: ytdProfit < 0 ? '#dc2626' : '#15803d' },
         ]} />
       </Card>
@@ -127,7 +144,7 @@ export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Pr
         <div style={dividerStyle} />
         <TaxRow label="合計税額" value={formatCurrency(totalTax)} bold />
         <p style={noteStyle}>
-          ※ 青色申告控除65万・基礎控除48万・設定の各種控除を反映した概算です。年初来累計の実績に基づきます。
+          ※ 青色申告控除65万・基礎控除48万・設定の各種控除を反映した概算です。経費未入力月は売上×目標経費率（{settings.targetExpenseRate}%）で見込み計上しています。
         </p>
         <button onClick={onShowTaxDetail} style={detailBtnStyle}>
           計算明細を見る →
