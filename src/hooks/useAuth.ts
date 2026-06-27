@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, provider } from '../lib/firebase';
+import { isEmailAllowed } from '../lib/allowList';
 
 export type AuthMode = 'loading' | 'guest' | 'loggedIn';
 
@@ -18,9 +19,21 @@ export const useAuth = () => {
   // ログインに成功すると 'loggedIn' になる。
   const [authMode, setAuthMode] = useState<AuthMode>('loading');
   const [authChecked, setAuthChecked] = useState(false);
+  // 許可リスト外のアカウントでログインを試みた場合のエラーメッセージ
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      // 許可リスト外のアカウントはページ再読み込みでのセッション復帰も含めて弾く
+      if (u && !isEmailAllowed(u.email)) {
+        await signOut(auth);
+        setUser(null);
+        setAuthChecked(true);
+        setAuthMode('loading');
+        setAuthError('このGoogleアカウントではログインできません。許可されたアカウントでログインしてください。');
+        return;
+      }
+
       setUser(u);
       setAuthChecked(true);
       if (u) {
@@ -33,14 +46,21 @@ export const useAuth = () => {
     return unsubscribe;
   }, []);
 
-  const login = () => signInWithPopup(auth, provider);
+  const login = async () => {
+    setAuthError(null);
+    await signInWithPopup(auth, provider);
+    // 成功後の許可リストチェックは onAuthStateChanged 側で一元的に行う
+  };
 
   const logout = async () => {
     await signOut(auth);
     setAuthMode('loading');
   };
 
-  const enterGuestMode = () => setAuthMode('guest');
+  const enterGuestMode = () => {
+    setAuthError(null);
+    setAuthMode('guest');
+  };
 
-  return { user, authMode, authChecked, login, logout, enterGuestMode };
+  return { user, authMode, authChecked, authError, login, logout, enterGuestMode };
 };

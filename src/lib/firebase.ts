@@ -7,6 +7,7 @@
 // VITE_FIREBASE_STORAGE_BUCKET=xxx.appspot.com
 // VITE_FIREBASE_MESSAGING_SENDER_ID=xxx
 // VITE_FIREBASE_APP_ID=xxx
+// VITE_ALLOWED_EMAILS=xxx@gmail.com,yyy@gmail.com   ← ログインを許可するアカウント（src/lib/allowList.ts参照）
 /// <reference types="vite/client" />
 
 import { initializeApp } from 'firebase/app';

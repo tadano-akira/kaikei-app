@@ -38,7 +38,7 @@ type SalesScreen =
   | { type: 'edit'; sales: Sales };
 
 export default function App() {
-  const { user, authMode, authChecked, login, logout, enterGuestMode } = useAuth();
+  const { user, authMode, authChecked, authError, login, logout, enterGuestMode } = useAuth();
   const isGuest = authMode === 'guest';
 
   const { expenses, save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, firestoreLoading: expenseLoading } = useExpenses(isGuest);
@@ -94,7 +94,7 @@ export default function App() {
   // 初回のFirebase認証確認が終わっていない間はローディング表示
   if (!authChecked) return <Loader text="読み込み中..." />;
   // 確認済みで未ログイン・ゲストでもない場合はログイン画面を表示
-  if (authMode === 'loading') return <LoginPage onLogin={login} onGuest={enterGuestMode} />;
+  if (authMode === 'loading') return <LoginPage onLogin={login} onGuest={enterGuestMode} error={authError} />;
   if (tab === 'expense' && (expenseLoading || salesLoading)) return <Loader text="データを読み込み中..." />;
 
   // 経費ナビゲーション

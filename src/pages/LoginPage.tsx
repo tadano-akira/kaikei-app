@@ -1,9 +1,10 @@
 interface Props {
   onLogin: () => void;
   onGuest: () => void;
+  error?: string | null;
 }
 
-export const LoginPage = ({ onLogin, onGuest }: Props) => (
+export const LoginPage = ({ onLogin, onGuest, error }: Props) => (
   <div style={{
     height: '100dvh',
     display: 'flex',
@@ -48,6 +49,21 @@ export const LoginPage = ({ onLogin, onGuest }: Props) => (
       </svg>
       Google でログイン
     </button>
+
+    {error && (
+      <p style={{
+        fontSize: 12,
+        color: '#dc2626',
+        background: '#fef2f2',
+        border: '0.5px solid #fecaca',
+        borderRadius: 8,
+        padding: '8px 12px',
+        textAlign: 'center',
+        maxWidth: 280,
+      }}>
+        {error}
+      </p>
+    )}
 
     <button onClick={onGuest} style={{
       background: 'none',
