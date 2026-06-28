@@ -158,11 +158,14 @@ export default function App() {
         {isInner ? (
           <button onClick={handleBack} style={backBtnStyle}>←</button>
         ) : (
-          <img
-            src={`${import.meta.env.BASE_URL}icons/icon-192.png`}
-            alt="ひとり帳"
-            style={{ width: 28, height: 28, borderRadius: 6, flexShrink: 0 }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+            <img
+              src={`${import.meta.env.BASE_URL}icons/icon-192.png`}
+              alt="ひとり帳"
+              style={{ width: 28, height: 28, borderRadius: 6 }}
+            />
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', letterSpacing: 0.5 }}>ひとり帳</span>
+          </div>
         )}
         <span style={headerTitleStyle}>{headerTitle()}</span>
         {showEditBtn ? (
@@ -198,7 +201,22 @@ export default function App() {
           />
         )}
         {tab === 'expense' && subTab === 'expense' && screen.type === 'detail' && (
-          <ExpenseDetail expense={screen.expense} onEdit={() => goExpenseEdit(screen.expense)} onDelete={(id) => { removeExpense(id); goExpenseList(); }} onBack={goExpenseList} />
+          <ExpenseDetail
+            expense={screen.expense}
+            onEdit={() => goExpenseEdit(screen.expense)}
+            onDelete={(id) => { removeExpense(id); goExpenseList(); }}
+            onDuplicate={async () => {
+              const e = screen.expense;
+              const [y, m, d] = e.date.split('-').map(Number);
+              const nm = m === 12 ? 1 : m + 1;
+              const ny = m === 12 ? y + 1 : y;
+              const lastDay = new Date(ny, nm, 0).getDate();
+              const nextDate = `${ny}-${String(nm).padStart(2, '0')}-${String(Math.min(d, lastDay)).padStart(2, '0')}`;
+              await saveExpense({ date: nextDate, category: e.category, amountWithTax: e.amountWithTax, taxRate: e.taxRate, payee: e.payee, expenseType: e.expenseType, purpose: e.purpose, memo: e.memo, ...(e.receiptUrl ? { receiptUrl: e.receiptUrl } : {}) });
+              goExpenseList();
+            }}
+            onBack={goExpenseList}
+          />
         )}
         {tab === 'expense' && subTab === 'expense' && screen.type === 'new' && (
           <ExpenseForm onSave={(input) => { saveExpense(input); goExpenseList(); }} onCancel={goExpenseList} />

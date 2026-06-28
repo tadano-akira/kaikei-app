@@ -6,10 +6,11 @@ interface Props {
   expense: Expense;
   onEdit: () => void;
   onDelete: (id: string) => void;
+  onDuplicate: () => void;
   onBack: () => void;
 }
 
-export const ExpenseDetail = ({ expense, onEdit, onDelete, onBack }: Props) => {
+export const ExpenseDetail = ({ expense, onEdit, onDelete, onDuplicate, onBack }: Props) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleDelete = () => {
@@ -84,6 +85,9 @@ export const ExpenseDetail = ({ expense, onEdit, onDelete, onBack }: Props) => {
           <button onClick={onEdit} style={editBtnStyle}>
             ✎ 編集
           </button>
+          <button onClick={onDuplicate} style={duplicateBtnStyle}>
+            ⊕ 複製
+          </button>
           <button onClick={() => setConfirmDelete(true)} style={deleteBtnStyle}>
             🗑 削除
           </button>
@@ -143,6 +147,17 @@ const editBtnStyle: React.CSSProperties = {
   background: '#f0f0f0',
   color: '#333333',
   border: '0.5px solid #d0d0d0',
+  borderRadius: 8,
+  fontSize: 13,
+  fontWeight: 500,
+  cursor: 'pointer',
+};
+const duplicateBtnStyle: React.CSSProperties = {
+  flex: 1,
+  padding: '10px 0',
+  background: '#eff6ff',
+  color: '#2563eb',
+  border: '0.5px solid #bfdbfe',
   borderRadius: 8,
   fontSize: 13,
   fontWeight: 500,
