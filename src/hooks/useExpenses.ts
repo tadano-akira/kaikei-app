@@ -140,7 +140,8 @@ export const useExpenses = (isGuest: boolean) => {
   };
 
   const currentMonthTotal = (): number => {
-    const ym = new Date().toISOString().slice(0, 7);
+    const d = new Date();
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     return expenses
       .filter(e => e.date.startsWith(ym))
       .reduce((sum, e) => sum + e.amountWithTax, 0);

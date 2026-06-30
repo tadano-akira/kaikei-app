@@ -31,7 +31,7 @@ function calcIncomeTax(income: number): number {
 
 export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Props) => {
   const now = new Date();
-  const currentYM = now.toISOString().slice(0, 7);
+  const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const currentYear = now.getFullYear();
   const currentMonthNum = now.getMonth() + 1;
 

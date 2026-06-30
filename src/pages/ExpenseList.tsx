@@ -9,7 +9,8 @@ interface Props {
   onSelect: (expense: Expense) => void;
 }
 
-const currentYM = new Date().toISOString().slice(0, 7);
+const localYM = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+const currentYM = localYM();
 
 export const ExpenseList = ({ groupedExpenses, budget = 0, onAdd, onSelect }: Props) => {
   const [monthIdx, setMonthIdx] = useState(0);

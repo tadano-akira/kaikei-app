@@ -110,7 +110,8 @@ export const useSales = (isGuest: boolean) => {
   };
 
   const currentMonthTotal = (): number => {
-    const ym = new Date().toISOString().slice(0, 7);
+    const d = new Date();
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     return sales
       .filter(s => s.date.startsWith(ym))
       .reduce((sum, s) => sum + s.amount, 0);

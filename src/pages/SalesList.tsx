@@ -24,7 +24,8 @@ const STATUS_ROW_BG: Record<SalesStatus, string> = {
   '入金済': '#f0fdf4',
 };
 
-const currentYM = new Date().toISOString().slice(0, 7);
+const localYM = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+const currentYM = localYM();
 
 export const SalesList = ({ groupedSales, onAdd, onSelect }: Props) => {
   const [monthIdx, setMonthIdx] = useState(0);
