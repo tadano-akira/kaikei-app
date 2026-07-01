@@ -12,6 +12,7 @@ export const ACCOUNT_CATEGORIES: AccountCategory[] = [
   '水道光熱費',
   '新聞図書費',
   'ソフトウェア利用料',
+  '機材購入',
   '雑費',
 ];
 
