@@ -81,7 +81,7 @@ export const MemoPage = ({ isGuest }: { isGuest: boolean }) => {
                 <button onClick={() => remove(m.id)} style={{ ...iconBtnStyle, color: 'var(--color-text-danger)' }}>削除</button>
               </div>
             </div>
-            <pre style={{ fontSize: 12, color: 'var(--color-text-secondary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0, fontFamily: 'monospace' }}>
+            <pre style={{ fontSize: 12, color: 'var(--color-text-secondary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: '6px 0 0', fontFamily: 'monospace', background: '#f5f5f5', borderRadius: 6, padding: '8px 10px' }}>
               {m.body}
             </pre>
           </div>
