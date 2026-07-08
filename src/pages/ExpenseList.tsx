@@ -44,9 +44,9 @@ export const ExpenseList = ({ groupedExpenses, budget = 0, onAdd, onSelect }: Pr
           label="残予算"
           value={remaining !== null ? formatCurrency(remaining) : '－'}
           valueColor={
-            remaining === null ? 'var(--color-text-tertiary)'
-            : remaining < 0 ? 'var(--color-text-danger)'
-            : 'var(--color-text-success)'
+            remaining === null ? '#aaaaaa'
+            : remaining < 0 ? '#dc2626'
+            : '#16a34a'
           }
           hint={isCurrentMonth && budget > 0 ? ` (枠 : ${formatCurrency(budget)})` : undefined}
         />
