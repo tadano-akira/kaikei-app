@@ -212,7 +212,7 @@ export default function App() {
               const ny = m === 12 ? y + 1 : y;
               const lastDay = new Date(ny, nm, 0).getDate();
               const nextDate = `${ny}-${String(nm).padStart(2, '0')}-${String(Math.min(d, lastDay)).padStart(2, '0')}`;
-              await saveExpense({ date: nextDate, category: e.category, amountWithTax: e.amountWithTax, taxRate: e.taxRate, payee: e.payee, expenseType: e.expenseType, purpose: e.purpose, memo: e.memo, ...(e.receiptUrl ? { receiptUrl: e.receiptUrl } : {}) });
+              await saveExpense({ date: nextDate, category: e.category, amountWithTax: e.amountWithTax, taxRate: e.taxRate, payee: e.payee, expenseType: e.expenseType, purpose: e.purpose, memo: e.memo });
               goExpenseList();
             }}
             onBack={goExpenseList}
