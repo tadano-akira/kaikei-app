@@ -24,6 +24,7 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 | 簡易メモ | コマンド・スクリプト・プロンプト等をカテゴリ別に保存 |
 | テキストエディタ | シンプルなテキスト入力。クラウド保存・txt出力対応 |
 | 日報 | 日付別の作業記録。今日やったこと・明日の予定・所感 |
+| REST API | Claude・ChatGPT等のAIツールから全データを操作できるHTTP API |
 
 ---
 
@@ -36,6 +37,7 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 | UI | インラインスタイル（CSS Variables） |
 | 認証 | Firebase Authentication（Google） |
 | DB | Firestore |
+| REST API | Firebase Cloud Functions（Gen 2）+ Express.js |
 | ホスティング | GitHub Pages |
 | CI/CD | GitHub Actions |
 | PWA | vite-plugin-pwa |
@@ -59,6 +61,12 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 - [x] 簡易メモ（カテゴリ別・コピー機能）
 - [x] テキストエディタ（保存ボタン方式・txt出力）
 - [x] 日報（日付別・編集・削除）
+
+### REST API
+- [x] 全リソースのCRUD（経費・売上・設定・ToDo・メモ・ノートパッド・日報）
+- [x] APIキー認証（`x-api-key` ヘッダー）
+- [x] OpenAPI仕様公開（`GET /api/openapi.json`）
+- [x] Claude / ChatGPT のツール呼び出しから操作可能
 
 ---
 
@@ -162,6 +170,44 @@ src/
 │   ├── NotepadPage.tsx
 │   └── DailyReportPage.tsx
 └── App.tsx         # ルーティング・タブ管理
+
+functions/          # Firebase Cloud Functions（REST API）
+└── src/
+    └── index.ts    # Express.js による全APIエンドポイント実装
+```
+
+---
+
+## REST API
+
+Claude・ChatGPT等のAIツールや外部スクリプトからデータを操作できるHTTP APIを提供している。
+詳細は [API.md](API.md) を参照。
+
+### エンドポイント一覧
+
+| リソース | GET | POST | PUT | DELETE |
+|---|---|---|---|---|
+| 経費 | `/api/expenses?year=` | `/api/expenses` | `/api/expenses/:id` | `/api/expenses/:id` |
+| 売上 | `/api/sales?year=` | `/api/sales` | `/api/sales/:id` | `/api/sales/:id` |
+| 設定 | `/api/settings` | — | `/api/settings` | — |
+| ToDo | `/api/todos` | `/api/todos` | `/api/todos/:id` | `/api/todos/:id` |
+| メモ | `/api/memos` | `/api/memos` | `/api/memos/:id` | `/api/memos/:id` |
+| ノートパッド | `/api/notepad` | — | `/api/notepad` | — |
+| 日報 | `/api/daily-reports` | `/api/daily-reports` | `/api/daily-reports/:id` | `/api/daily-reports/:id` |
+
+### 認証
+
+すべてのリクエストに `x-api-key` ヘッダーが必要。APIキーは `.env.local` に保存（git管理外）。
+
+### AIツールへの組み込み
+
+- **Claude**: プロジェクト指示にベースURLとAPIキーを記載するだけで利用可能
+- **ChatGPT（GPTs）**: Actions の Schema URL に `/api/openapi.json` を指定してインポート
+
+### デプロイ
+
+```bash
+firebase deploy --only functions --project <PROJECT_ID>
 ```
 
 ---
