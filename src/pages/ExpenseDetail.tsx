@@ -58,21 +58,23 @@ export const ExpenseDetail = ({ expense, onEdit, onDelete, onDuplicate, onBack }
         />
         {expense.purpose && <DetailRow label="利用目的" value={expense.purpose} />}
         {expense.memo && <DetailRow label="メモ" value={expense.memo} />}
-        {expense.receiptUrl && (
-          <DetailRow
-            label="証票"
-            value={
-              <a
-                href={expense.receiptUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#2563eb', fontSize: 13, textDecoration: 'none' }}
-              >
+        <DetailRow
+          label="証票"
+          value={
+            expense.noReceipt ? (
+              <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 10, background: '#f3f4f6', color: '#6b7280', fontWeight: 500 }}>
+                証票なし
+              </span>
+            ) : expense.receiptUrl ? (
+              <a href={expense.receiptUrl} target="_blank" rel="noopener noreferrer"
+                style={{ color: '#2563eb', fontSize: 13, textDecoration: 'none' }}>
                 リンクを開く ↗
               </a>
-            }
-          />
-        )}
+            ) : (
+              <span style={{ fontSize: 12, color: '#aaaaaa' }}>未登録</span>
+            )
+          }
+        />
         <DetailRow
           label="登録日"
           value={new Date(expense.createdAt).toLocaleDateString('ja-JP')}

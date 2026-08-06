@@ -20,7 +20,8 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
   const [purpose, setPurpose] = useState(initial?.purpose ?? '');
   const [memo, setMemo] = useState(initial?.memo ?? '');
   const [receiptUrl, setReceiptUrl] = useState(initial?.receiptUrl ?? '');
-  const [showDetail, setShowDetail] = useState(!!(initial?.purpose || initial?.memo));
+  const [noReceipt, setNoReceipt] = useState(initial?.noReceipt ?? false);
+  const [showDetail, setShowDetail] = useState(!!(initial?.purpose || initial?.memo || initial?.noReceipt || initial?.receiptUrl));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const amount = parseInt(amountWithTax.replace(/,/g, ''), 10) || 0;
@@ -37,7 +38,11 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
   const handleSave = () => {
     if (!validate()) return;
     const input: Parameters<typeof onSave>[0] = { date, category, amountWithTax: amount, taxRate, payee, expenseType, purpose, memo };
-    if (receiptUrl.trim()) input.receiptUrl = receiptUrl.trim();
+    if (noReceipt) {
+      input.noReceipt = true;
+    } else if (receiptUrl.trim()) {
+      input.receiptUrl = receiptUrl.trim();
+    }
     onSave(input);
   };
 
@@ -199,14 +204,30 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
               />
             </div>
             <div>
-              <label style={labelStyle}>証票URL</label>
-              <input
-                type="url"
-                value={receiptUrl}
-                onChange={e => setReceiptUrl(e.target.value)}
-                placeholder="https://drive.google.com/..."
-                style={inputStyle}
-              />
+              <label style={labelStyle}>証票</label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, cursor: 'pointer', userSelect: 'none' }}>
+                <input
+                  type="checkbox"
+                  checked={noReceipt}
+                  onChange={e => {
+                    setNoReceipt(e.target.checked);
+                    if (e.target.checked) setReceiptUrl('');
+                  }}
+                  style={{ width: 16, height: 16, cursor: 'pointer' }}
+                />
+                <span style={{ fontSize: 13, color: noReceipt ? '#dc2626' : 'var(--color-text-secondary)' }}>
+                  証票なし（家賃案分・交通費ICなど）
+                </span>
+              </label>
+              {!noReceipt && (
+                <input
+                  type="url"
+                  value={receiptUrl}
+                  onChange={e => setReceiptUrl(e.target.value)}
+                  placeholder="https://drive.google.com/..."
+                  style={inputStyle}
+                />
+              )}
             </div>
           </div>
         )}
