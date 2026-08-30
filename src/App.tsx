@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Expense, Sales } from './types';
+import { formatCurrency } from './constants';
 import { useExpenses } from './hooks/useExpenses';
 import { useSales } from './hooks/useSales';
 import { useSettings } from './hooks/useSettings';
@@ -41,11 +42,11 @@ export default function App() {
   const { user, authMode, authChecked, authError, login, logout, enterGuestMode } = useAuth();
   const isGuest = authMode === 'guest';
 
-  const { expenses, save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, firestoreLoading: expenseLoading } = useExpenses(isGuest);
+  const { expenses, save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, currentMonthTotal: expenseMonthTotal, firestoreLoading: expenseLoading } = useExpenses(isGuest);
   const { sales, save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales(isGuest);
   const { settings, loading: settingsLoading, save: saveSettings } = useSettings(isGuest);
 
-  const [tab, setTab] = useState<Tab>('expense');
+  const [tab, setTab] = useState<Tab>('todo');
   const [subTab, setSubTab] = useState<AccountSubTab>('expense');
   const [screen, setScreen] = useState<Screen>({ type: 'list' });
   const [salesScreen, setSalesScreen] = useState<SalesScreen>({ type: 'list' });
@@ -192,6 +193,18 @@ export default function App() {
       )}
 
       <main style={mainStyle}>
+        {tab === 'expense' && !isInner && (
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+            <div style={{ flex: 1, background: 'var(--color-background-secondary)', borderRadius: 10, padding: '10px 14px', border: '0.5px solid var(--color-border-tertiary)' }}>
+              <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>今月の経費</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--color-text-danger)' }}>{formatCurrency(expenseMonthTotal())}</div>
+            </div>
+            <div style={{ flex: 1, background: 'var(--color-background-secondary)', borderRadius: 10, padding: '10px 14px', border: '0.5px solid var(--color-border-tertiary)' }}>
+              <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>今月の売上</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--color-text-success)' }}>{formatCurrency(salesMonthTotal())}</div>
+            </div>
+          </div>
+        )}
         {tab === 'expense' && subTab === 'expense' && screen.type === 'list' && (
           <ExpenseList
             groupedExpenses={expenseGrouped()}
