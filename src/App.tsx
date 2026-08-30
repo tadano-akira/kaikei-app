@@ -270,9 +270,9 @@ export default function App() {
       </main>
 
       <nav style={navStyle}>
+        <NavItem icon="☑" label="ToDo" active={tab === 'todo'} onClick={() => setTab('todo')} />
         <NavItem icon="💴" label="会計" active={tab === 'expense'} onClick={() => { setTab('expense'); }} />
         <NavItem icon="📊" label="集計" active={tab === 'dashboard'} onClick={() => setTab('dashboard')} />
-        <NavItem icon="☑" label="ToDo" active={tab === 'todo'} onClick={() => setTab('todo')} />
         <NavItem icon="📝" label="メモ" active={tab === 'memo'} onClick={() => setTab('memo')} />
         <NavItem icon="📄" label="テキスト" active={tab === 'notepad'} onClick={() => setTab('notepad')} />
         <NavItem icon="📋" label="日報" active={tab === 'daily'} onClick={() => setTab('daily')} />

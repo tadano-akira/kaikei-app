@@ -28,7 +28,10 @@ const localYM = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 
 const currentYM = localYM();
 
 export const SalesList = ({ groupedSales, onAdd, onSelect }: Props) => {
-  const [monthIdx, setMonthIdx] = useState(0);
+  const [monthIdx, setMonthIdx] = useState(() => {
+    const idx = groupedSales.findIndex(g => g.month === currentYM);
+    return idx >= 0 ? idx : 0;
+  });
 
   const safeIdx = Math.min(monthIdx, Math.max(0, groupedSales.length - 1));
   const selectedGroup = groupedSales[safeIdx];

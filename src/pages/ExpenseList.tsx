@@ -13,7 +13,10 @@ const localYM = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 
 const currentYM = localYM();
 
 export const ExpenseList = ({ groupedExpenses, budget = 0, onAdd, onSelect }: Props) => {
-  const [monthIdx, setMonthIdx] = useState(0);
+  const [monthIdx, setMonthIdx] = useState(() => {
+    const idx = groupedExpenses.findIndex(g => g.month === currentYM);
+    return idx >= 0 ? idx : 0;
+  });
 
   const safeIdx = Math.min(monthIdx, Math.max(0, groupedExpenses.length - 1));
   const selectedGroup = groupedExpenses[safeIdx];
