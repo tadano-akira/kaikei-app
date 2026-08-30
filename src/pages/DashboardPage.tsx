@@ -43,7 +43,7 @@ export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Pr
     .filter(e => e.date.startsWith(currentYM))
     .reduce((sum, e) => sum + e.amountWithTax, 0);
   const thisMonthProfit = thisMonthSales - thisMonthExp;
-  const budget = Math.round(thisMonthSales * settings.targetExpenseRate / 100);
+  const budget = settings.monthlyExpenseBudget;
   const remaining = budget > 0 ? budget - thisMonthExp : null;
 
   // 年間累計 (YTD)
@@ -60,10 +60,7 @@ export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Pr
     if (monthExpenses.length > 0) {
       ytdExpCombined += monthExpenses.reduce((sum, e) => sum + e.amountWithTax, 0);
     } else {
-      const monthSales = sales
-        .filter(s => s.date.startsWith(ym))
-        .reduce((sum, s) => sum + s.amount, 0);
-      ytdExpCombined += Math.round(monthSales * settings.targetExpenseRate / 100);
+      ytdExpCombined += settings.monthlyExpenseBudget;
     }
   }
   const ytdProfit = ytdSales - ytdExpCombined;
@@ -144,7 +141,7 @@ export const DashboardPage = ({ expenses, sales, settings, onShowTaxDetail }: Pr
         <div style={dividerStyle} />
         <TaxRow label="合計税額" value={formatCurrency(totalTax)} bold />
         <p style={noteStyle}>
-          ※ 青色申告控除65万・基礎控除48万・設定の各種控除を反映した概算です。経費未入力月は売上×目標経費率（{settings.targetExpenseRate}%）で見込み計上しています。
+          ※ 青色申告控除65万・基礎控除48万・設定の各種控除を反映した概算です。経費未入力月は月間経費予算（{formatCurrency(settings.monthlyExpenseBudget)}）で見込み計上しています。
         </p>
         <button onClick={onShowTaxDetail} style={detailBtnStyle}>
           計算明細を見る →
