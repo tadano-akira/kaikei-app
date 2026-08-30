@@ -6,6 +6,7 @@ import { Settings } from '../types';
 
 const DEFAULT: Settings = {
   targetExpenseRate: 30,
+  monthlyExpenseBudget: 0,
   residentialTaxRate: 10,
   consumptionTaxCategory: '第5種',
   consumptionTaxSpecialRate: 0.3,

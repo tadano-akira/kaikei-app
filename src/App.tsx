@@ -208,7 +208,7 @@ export default function App() {
         {tab === 'expense' && subTab === 'expense' && screen.type === 'list' && (
           <ExpenseList
             groupedExpenses={expenseGrouped()}
-            budget={Math.round(salesMonthTotal() * settings.targetExpenseRate / 100)}
+            budget={settings.monthlyExpenseBudget}
             onAdd={goExpenseNew}
             onSelect={goExpenseDetail}
           />

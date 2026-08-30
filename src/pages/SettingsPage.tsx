@@ -34,6 +34,7 @@ const CATEGORIES: { value: ConsumptionTaxCategory; label: string }[] = [
 
 export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Props) => {
   const [targetExpenseRate, setTargetExpenseRate] = useState('');
+  const [monthlyExpenseBudget, setMonthlyExpenseBudget] = useState('');
   const [residentialTaxRate, setResidentialTaxRate] = useState('');
   const [consumptionTaxCategory, setConsumptionTaxCategory] = useState<ConsumptionTaxCategory>('第5種');
   const [consumptionTaxSpecialRate, setConsumptionTaxSpecialRate] = useState('');
@@ -48,6 +49,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
 
   useEffect(() => {
     setTargetExpenseRate(settings.targetExpenseRate.toString());
+    setMonthlyExpenseBudget(settings.monthlyExpenseBudget.toString());
     setResidentialTaxRate(settings.residentialTaxRate.toString());
     setConsumptionTaxCategory(settings.consumptionTaxCategory);
     setConsumptionTaxSpecialRate(settings.consumptionTaxSpecialRate.toString());
@@ -63,6 +65,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
     setSaving(true);
     await onSave({
       targetExpenseRate: parseFloat(targetExpenseRate) || 0,
+      monthlyExpenseBudget: parseInt(monthlyExpenseBudget) || 0,
       residentialTaxRate: parseFloat(residentialTaxRate) || 10,
       consumptionTaxCategory,
       consumptionTaxSpecialRate: parseFloat(consumptionTaxSpecialRate) || 0,
@@ -92,12 +95,16 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
       {/* 会計設定 */}
       <section style={sectionStyle}>
         <h2 style={sectionTitleStyle}>会計設定</h2>
-        <FieldRow label="目標経費率" hint="売上に対する経費の目標比率">
+        <FieldRow label="目標経費率" hint="売上に対する経費の目標比率（税金試算に使用）">
           <NumberInputWithUnit
             value={targetExpenseRate}
             onChange={setTargetExpenseRate}
             unit="%" min={0} max={100} step={1}
           />
+        </FieldRow>
+        <div style={dividerStyle} />
+        <FieldRow label="月間経費予算" hint="経費一覧の残予算表示に使用（固定額）">
+          <YenInput value={monthlyExpenseBudget} onChange={setMonthlyExpenseBudget} />
         </FieldRow>
       </section>
 

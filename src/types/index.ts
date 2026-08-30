@@ -96,6 +96,7 @@ export type ConsumptionTaxCategory = '第1種' | '第2種' | '第3種' | '第4�
 
 export interface Settings {
   targetExpenseRate: number;         // 目標経費率 (%)
+  monthlyExpenseBudget: number;      // 月間経費予算 (円)
   residentialTaxRate: number;        // 住民税率 (%), default 10
   consumptionTaxCategory: ConsumptionTaxCategory;
   consumptionTaxSpecialRate: number; // 消費税特例係数 (0.0〜1.0)
