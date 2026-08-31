@@ -4,7 +4,7 @@ import { formatCurrency } from '../constants';
 
 interface Props {
   initial?: Sales;
-  onSave: (input: SalesInput) => void;
+  onSave: (input: SalesInput) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -21,6 +21,8 @@ export const SalesForm = ({ initial, onSave, onCancel }: Props) => {
   const [amount, setAmount] = useState(initial?.amount?.toString() ?? '');
   const [memo, setMemo] = useState(initial?.memo ?? '');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const parsedAmount = parseInt(amount.replace(/,/g, ''), 10) || 0;
 
@@ -34,12 +36,20 @@ export const SalesForm = ({ initial, onSave, onCancel }: Props) => {
     return Object.keys(e).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validate()) return;
     const input: SalesInput = { date, paymentDueDate, status, client, amount: parsedAmount };
     if (paymentDate) input.paymentDate = paymentDate;
     if (memo.trim()) input.memo = memo;
-    onSave(input);
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await onSave(input);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : '保存に失敗しました。');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -138,8 +148,11 @@ export const SalesForm = ({ initial, onSave, onCancel }: Props) => {
       {/* ボタン */}
       <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
         <button onClick={onCancel} style={cancelBtnStyle}>キャンセル</button>
-        <button onClick={handleSave} style={saveBtnStyle}>保存する</button>
+        <button onClick={handleSave} disabled={saving} style={saveBtnStyle}>
+          {saving ? '通信を確認中…' : '保存する'}
+        </button>
       </div>
+      {saveError && <div role="alert" style={errorStyle}>{saveError}</div>}
     </div>
   );
 };

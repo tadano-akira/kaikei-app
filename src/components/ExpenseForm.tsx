@@ -4,7 +4,7 @@ import { ACCOUNT_CATEGORIES, TAX_RATES, calcTax, formatCurrency } from '../const
 
 interface Props {
   initial?: Expense;
-  onSave: (input: ExpenseInput) => void;
+  onSave: (input: ExpenseInput) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -23,6 +23,8 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
   const [noReceipt, setNoReceipt] = useState(initial?.noReceipt ?? false);
   const [showDetail, setShowDetail] = useState(!!(initial?.purpose || initial?.memo || initial?.noReceipt || initial?.receiptUrl));
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const amount = parseInt(amountWithTax.replace(/,/g, ''), 10) || 0;
   const { amountWithoutTax, taxAmount } = calcTax(amount, taxRate);
@@ -35,7 +37,7 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
     return Object.keys(e).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validate()) return;
     const input: Parameters<typeof onSave>[0] = { date, category, amountWithTax: amount, taxRate, payee, expenseType, purpose, memo };
     if (noReceipt) {
@@ -43,7 +45,15 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
     } else if (receiptUrl.trim()) {
       input.receiptUrl = receiptUrl.trim();
     }
-    onSave(input);
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await onSave(input);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : '保存に失敗しました。');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -236,8 +246,11 @@ export const ExpenseForm = ({ initial, onSave, onCancel }: Props) => {
       {/* ボタン */}
       <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
         <button onClick={onCancel} style={cancelBtnStyle}>キャンセル</button>
-        <button onClick={handleSave} style={saveBtnStyle}>保存する</button>
+        <button onClick={handleSave} disabled={saving} style={saveBtnStyle}>
+          {saving ? '通信を確認中…' : '保存する'}
+        </button>
       </div>
+      {saveError && <div role="alert" style={errorStyle}>{saveError}</div>}
     </div>
   );
 };

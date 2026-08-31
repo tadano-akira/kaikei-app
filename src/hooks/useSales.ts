@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
-  collection, doc, addDoc, updateDoc, deleteDoc,
+  collection, doc, setDoc, updateDoc, deleteDoc,
   onSnapshot
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Sales, SalesInput } from '../types';
+import { runNetworkAction } from '../lib/network';
 
 const getRef = (uid: string) => {
   const year = new Date().getFullYear().toString();
@@ -15,6 +16,7 @@ const getRef = (uid: string) => {
 export const useSales = (isGuest: boolean) => {
   const [sales, setSales] = useState<Sales[]>([]);
   const [firestoreLoading, setFirestoreLoading] = useState(true);
+  const pendingCreateId = useRef<string | null>(null);
 
   useEffect(() => {
     if (isGuest) {
@@ -69,7 +71,10 @@ export const useSales = (isGuest: boolean) => {
     const data = Object.fromEntries(
       Object.entries({ ...input, createdAt: now, updatedAt: now }).filter(([, v]) => v !== undefined)
     );
-    await addDoc(getRef(uid), data);
+    const clientId = pendingCreateId.current ?? crypto.randomUUID();
+    pendingCreateId.current = clientId;
+    await runNetworkAction(() => setDoc(doc(getRef(uid), clientId), data));
+    pendingCreateId.current = null;
   };
 
   const update = async (id: string, input: SalesInput): Promise<void> => {
@@ -85,7 +90,7 @@ export const useSales = (isGuest: boolean) => {
     const data = Object.fromEntries(
       Object.entries({ ...input, updatedAt: now }).filter(([, v]) => v !== undefined)
     );
-    await updateDoc(doc(getRef(uid), id), data);
+    await runNetworkAction(() => updateDoc(doc(getRef(uid), id), data));
   };
 
   const remove = async (id: string): Promise<void> => {
@@ -96,7 +101,7 @@ export const useSales = (isGuest: boolean) => {
 
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
-    await deleteDoc(doc(getRef(uid), id));
+    await runNetworkAction(() => deleteDoc(doc(getRef(uid), id)));
   };
 
   const groupedByMonth = (): { month: string; items: Sales[] }[] => {

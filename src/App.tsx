@@ -22,6 +22,8 @@ import { DailyReportPage } from './pages/DailyReportPage';
 import { MigrationDialog } from './components/MigrationDialog';
 import { hasGuestData, getGuestDataSummary, GuestDataSummary } from './lib/localStore';
 import { migrateGuestDataToFirestore, discardGuestData } from './lib/migration';
+import { useNetworkStatus } from './hooks/useNetworkStatus';
+import { runNetworkAction } from './lib/network';
 
 type Tab = 'expense' | 'dashboard' | 'todo' | 'memo' | 'notepad' | 'daily' | 'settings';
 type AccountSubTab = 'expense' | 'sales';
@@ -41,6 +43,7 @@ type SalesScreen =
 export default function App() {
   const { user, authMode, authChecked, authError, login, logout, enterGuestMode } = useAuth();
   const isGuest = authMode === 'guest';
+  const networkState = useNetworkStatus();
 
   const { expenses, save: saveExpense, update: updateExpense, remove: removeExpense, groupedByMonth: expenseGrouped, currentMonthTotal: expenseMonthTotal, firestoreLoading: expenseLoading } = useExpenses(isGuest);
   const { sales, save: saveSales, update: updateSales, remove: removeSales, groupedByMonth: salesGrouped, currentMonthTotal: salesMonthTotal, firestoreLoading: salesLoading } = useSales(isGuest);
@@ -77,7 +80,7 @@ export default function App() {
     setMigrating(true);
     setMigrationError(null);
     try {
-      await migrateGuestDataToFirestore(user.uid);
+      await runNetworkAction(() => migrateGuestDataToFirestore(user.uid));
       setMigrationSummary(null);
     } catch (e) {
       console.error('ゲストデータ移行エラー:', e);
@@ -184,6 +187,16 @@ export default function App() {
         </div>
       )}
 
+      {!isGuest && networkState !== 'online' && (
+        <div role="status" aria-live="polite" style={networkBannerStyle}>
+          {networkState === 'checking'
+            ? '通信状態を確認しています…'
+            : networkState === 'offline'
+              ? 'オフラインです。クラウドへの保存操作は利用できません。'
+              : '通信が不安定です。接続が回復するまで保存操作を停止します。'}
+        </div>
+      )}
+
       {/* 会計サブタブ */}
       {tab === 'expense' && !isInner && (
         <div style={subTabBarStyle}>
@@ -217,7 +230,7 @@ export default function App() {
           <ExpenseDetail
             expense={screen.expense}
             onEdit={() => goExpenseEdit(screen.expense)}
-            onDelete={(id) => { removeExpense(id); goExpenseList(); }}
+            onDelete={async (id) => { await removeExpense(id); goExpenseList(); }}
             onDuplicate={async () => {
               const e = screen.expense;
               const [y, m, d] = e.date.split('-').map(Number);
@@ -232,23 +245,23 @@ export default function App() {
           />
         )}
         {tab === 'expense' && subTab === 'expense' && screen.type === 'new' && (
-          <ExpenseForm onSave={(input) => { saveExpense(input); goExpenseList(); }} onCancel={goExpenseList} />
+          <ExpenseForm onSave={async (input) => { await saveExpense(input); goExpenseList(); }} onCancel={goExpenseList} />
         )}
         {tab === 'expense' && subTab === 'expense' && screen.type === 'edit' && (
-          <ExpenseForm initial={screen.expense} onSave={(input) => { updateExpense(screen.expense.id, input); goExpenseList(); }} onCancel={goExpenseList} />
+          <ExpenseForm initial={screen.expense} onSave={async (input) => { await updateExpense(screen.expense.id, input); goExpenseList(); }} onCancel={goExpenseList} />
         )}
 
         {tab === 'expense' && subTab === 'sales' && salesScreen.type === 'list' && (
           <SalesList groupedSales={salesGrouped()} onAdd={goSalesNew} onSelect={goSalesDetail} />
         )}
         {tab === 'expense' && subTab === 'sales' && salesScreen.type === 'detail' && (
-          <SalesDetail sales={salesScreen.sales} onEdit={() => goSalesEdit(salesScreen.sales)} onDelete={(id) => { removeSales(id); goSalesList(); }} onBack={goSalesList} />
+          <SalesDetail sales={salesScreen.sales} onEdit={() => goSalesEdit(salesScreen.sales)} onDelete={async (id) => { await removeSales(id); goSalesList(); }} onBack={goSalesList} />
         )}
         {tab === 'expense' && subTab === 'sales' && salesScreen.type === 'new' && (
-          <SalesForm onSave={(input) => { saveSales(input); goSalesList(); }} onCancel={goSalesList} />
+          <SalesForm onSave={async (input) => { await saveSales(input); goSalesList(); }} onCancel={goSalesList} />
         )}
         {tab === 'expense' && subTab === 'sales' && salesScreen.type === 'edit' && (
-          <SalesForm initial={salesScreen.sales} onSave={(input) => { updateSales(salesScreen.sales.id, input); goSalesList(); }} onCancel={goSalesList} />
+          <SalesForm initial={salesScreen.sales} onSave={async (input) => { await updateSales(salesScreen.sales.id, input); goSalesList(); }} onCancel={goSalesList} />
         )}
 
         {tab === 'dashboard' && !showTaxDetail && (
@@ -331,5 +344,6 @@ const editIconBtnStyle: React.CSSProperties = { background: 'none', border: 'non
 const logoutBtnStyle: React.CSSProperties = { background: 'none', border: 'none', fontSize: 12, color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '0 4px' };
 const subTabBarStyle: React.CSSProperties = { display: 'flex', borderBottom: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', padding: '0 16px' };
 const guestBannerStyle: React.CSSProperties = { padding: '6px 16px', fontSize: 11, textAlign: 'center', background: '#fff7e6', color: '#9a6700', borderBottom: '0.5px solid #f0d9a0' };
+const networkBannerStyle: React.CSSProperties = { padding: '7px 16px', fontSize: 12, textAlign: 'center', background: '#fff1f2', color: '#b42318', borderBottom: '0.5px solid #fecdd3' };
 const mainStyle: React.CSSProperties = { flex: 1, overflowY: 'auto', padding: '16px', paddingBottom: 80 };
 const navStyle: React.CSSProperties = { display: 'flex', borderTop: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', position: 'sticky', bottom: 0 };

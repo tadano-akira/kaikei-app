@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { useState, useEffect, useRef } from 'react';
+import { collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Todo, Priority } from '../types';
+import { runNetworkAction } from '../lib/network';
 
 const getRef = (uid: string) =>
   collection(db, 'users', uid, 'todos');
@@ -10,6 +11,7 @@ const getRef = (uid: string) =>
 export const useTodos = (isGuest: boolean) => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
+  const pendingCreateId = useRef<string | null>(null);
 
   useEffect(() => {
     if (isGuest) {
@@ -45,7 +47,10 @@ export const useTodos = (isGuest: boolean) => {
 
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    await addDoc(getRef(uid), { text, priority, done: false, createdAt: now, updatedAt: now });
+    const clientId = pendingCreateId.current ?? crypto.randomUUID();
+    pendingCreateId.current = clientId;
+    await runNetworkAction(() => setDoc(doc(getRef(uid), clientId), { text, priority, done: false, createdAt: now, updatedAt: now }));
+    pendingCreateId.current = null;
   };
 
   const toggle = async (id: string, done: boolean) => {
@@ -58,7 +63,7 @@ export const useTodos = (isGuest: boolean) => {
 
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    await updateDoc(doc(getRef(uid), id), { done, updatedAt: now });
+    await runNetworkAction(() => updateDoc(doc(getRef(uid), id), { done, updatedAt: now }));
   };
 
   const remove = async (id: string) => {
@@ -69,7 +74,7 @@ export const useTodos = (isGuest: boolean) => {
 
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    await deleteDoc(doc(getRef(uid), id));
+    await runNetworkAction(() => deleteDoc(doc(getRef(uid), id)));
   };
 
   return { todos, loading, add, toggle, remove };

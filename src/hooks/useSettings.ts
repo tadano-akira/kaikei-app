@@ -3,6 +3,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Settings } from '../types';
+import { runNetworkAction } from '../lib/network';
 
 const DEFAULT: Settings = {
   targetExpenseRate: 30,
@@ -52,7 +53,7 @@ export const useSettings = (isGuest: boolean) => {
 
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    await setDoc(getRef(uid), record);
+    await runNetworkAction(() => setDoc(getRef(uid), record));
     setSettings(record);
   };
 

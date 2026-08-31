@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { localStore, LOCAL_KEYS } from '../lib/localStore';
+import { runNetworkAction } from '../lib/network';
 
 const getRef = (uid: string) =>
   doc(db, 'users', uid, 'notepad', 'main');
@@ -36,7 +37,7 @@ export const useNotepad = (isGuest: boolean) => {
 
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    await setDoc(getRef(uid), { content, updatedAt: new Date().toISOString() });
+    await runNetworkAction(() => setDoc(getRef(uid), { content, updatedAt: new Date().toISOString() }));
     setSaved(true);
   };
 

@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
-  collection, doc, addDoc, updateDoc, deleteDoc,
+  collection, doc, setDoc, updateDoc, deleteDoc,
   onSnapshot, query, orderBy
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Expense, ExpenseInput } from '../types';
 import { calcTax } from '../constants';
+import { runNetworkAction } from '../lib/network';
 
 export const useExpenses = (isGuest: boolean) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [firestoreLoading, setFirestoreLoading] = useState(true);
+  const pendingCreateId = useRef<string | null>(null);
 
   const getCollectionRef = (uid: string) => {
     const year = new Date().getFullYear().toString();
@@ -83,13 +85,16 @@ export const useExpenses = (isGuest: boolean) => {
 
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
-    await addDoc(getCollectionRef(uid), {
+    const clientId = pendingCreateId.current ?? crypto.randomUUID();
+    pendingCreateId.current = clientId;
+    await runNetworkAction(() => setDoc(doc(getCollectionRef(uid), clientId), {
       ...input,
       amountWithoutTax,
       taxAmount,
       createdAt: now,
       updatedAt: now,
-    });
+    }));
+    pendingCreateId.current = null;
   };
 
   const update = async (id: string, input: ExpenseInput): Promise<void> => {
@@ -109,12 +114,12 @@ export const useExpenses = (isGuest: boolean) => {
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
     const ref = doc(getCollectionRef(uid), id);
-    await updateDoc(ref, {
+    await runNetworkAction(() => updateDoc(ref, {
       ...input,
       amountWithoutTax,
       taxAmount,
       updatedAt: now,
-    });
+    }));
   };
 
   const remove = async (id: string): Promise<void> => {
@@ -126,7 +131,7 @@ export const useExpenses = (isGuest: boolean) => {
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error('未ログイン');
     const ref = doc(getCollectionRef(uid), id);
-    await deleteDoc(ref);
+    await runNetworkAction(() => deleteDoc(ref));
   };
 
   const groupedByMonth = (): { month: string; items: Expense[] }[] => {
