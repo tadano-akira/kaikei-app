@@ -25,6 +25,7 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 | テキストエディタ | シンプルなテキスト入力。クラウド保存・txt出力対応 |
 | 日報 | 日付別の作業記録。今日やったこと・明日の予定・所感 |
 | REST API | Claude・ChatGPT等のAIツールから全データを操作できるHTTP API |
+| 通信安定性ガード | 通信不安定・オフライン時に保存操作を停止。リトライしても重複を作らない冪等書き込み |
 
 ---
 
@@ -41,6 +42,7 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 | ホスティング | GitHub Pages |
 | CI/CD | GitHub Actions |
 | PWA | vite-plugin-pwa |
+| 通信状態監視 | `navigator.onLine` + favicon への HEAD 疎通確認（30秒間隔ポーリング） |
 
 ---
 
@@ -61,6 +63,13 @@ Google認証でログインし、Firestoreにデータを保存。スマホ・PC
 - [x] 簡易メモ（カテゴリ別・コピー機能）
 - [x] テキストエディタ（保存ボタン方式・txt出力）
 - [x] 日報（日付別・編集・削除）
+
+### 通信安定性
+- [x] ネットワーク状態の監視・バナー表示（オフライン / 不安定）
+- [x] 保存前の疎通確認と保存操作のブロック
+- [x] 書き込みの多重実行防止（アプリ全体で直列化）
+- [x] クライアント採番IDによる冪等な新規作成（リトライ時の重複防止）
+- [x] ゲストデータ移行の冪等化（再実行しても重複しない）
 
 ### REST API
 - [x] 全リソースのCRUD（経費・売上・設定・ToDo・メモ・ノートパッド・日報）
@@ -147,7 +156,7 @@ your-github-username.github.io
 src/
 ├── types/          # TypeScript型定義（Expense・Sales・Settings等）
 ├── constants/      # 定数・税計算・フォーマットユーティリティ
-├── lib/            # Firebase設定
+├── lib/            # Firebase設定・通信状態管理（network.ts）・ゲストデータ移行
 ├── hooks/          # カスタムフック
 │   ├── useAuth.ts
 │   ├── useExpenses.ts
@@ -156,7 +165,8 @@ src/
 │   ├── useTodos.ts
 │   ├── useMemos.ts
 │   ├── useNotepad.ts
-│   └── useDailyReports.ts
+│   ├── useDailyReports.ts
+│   └── useNetworkStatus.ts
 ├── components/     # 共通コンポーネント（ExpenseForm・SalesForm）
 ├── pages/          # 画面コンポーネント
 │   ├── LoginPage.tsx
@@ -209,6 +219,35 @@ Claude・ChatGPT等のAIツールや外部スクリプトからデータを操�
 ```bash
 firebase deploy --only functions --project <PROJECT_ID>
 ```
+
+---
+
+## 通信安定性ガード
+
+通信が不安定な回線・モバイル環境での利用を想定し、保存操作（Firestore への書き込み）に対して次のガードをかけている。実装は [src/lib/network.ts](src/lib/network.ts) と [src/hooks/useNetworkStatus.ts](src/hooks/useNetworkStatus.ts)。
+
+### ネットワーク状態
+
+`online` / `checking` / `offline` / `unstable` の4状態を管理する。
+
+- `navigator.onLine` と `online` / `offline` イベントを購読する。
+- 併せて `favicon.png` へ `HEAD` リクエストを投げ、実際の疎通を確認する。タイムアウトは3秒。
+- 30秒間隔でポーリングし、状態変化を `CustomEvent` でアプリ全体に配信する。
+- 非ゲストで `online` 以外のとき、画面上部に警告バナーを表示する。
+
+### 保存操作のガード
+
+すべての作成・更新・削除は `runNetworkAction()` を経由する。
+
+- 実行前に疎通確認する。失敗した場合は書き込まず、エラーを投げる。
+- モジュール単位のフラグで書き込みを直列化する。実行中の別書き込みは弾く。
+- フォームは保存中ボタンを disabled にし、失敗時はエラーメッセージを表示する。
+
+### 冪等な書き込み
+
+- 新規作成は `addDoc` を使わない。クライアントで採番した UUID をドキュメントIDに指定して `setDoc` する。
+- 採番したIDは保存成功まで保持する。通信失敗でリトライしても同じドキュメントに書くため、重複が発生しない。
+- ゲストデータの Firestore 移行も、ローカルIDをそのままドキュメントIDに使う。移行を再実行しても重複しない。
 
 ---
 
