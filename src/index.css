@@ -36,3 +36,15 @@ button:disabled {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
+
+/* スマホ向けの固定幅。PCの広いウィンドウでは少し広げるが、
+   可読性のため無制限には広げない（900px以上で1000pxまで）。 */
+.app-shell {
+  max-width: 480px;
+}
+
+@media (min-width: 900px) {
+  .app-shell {
+    max-width: 1000px;
+  }
+}

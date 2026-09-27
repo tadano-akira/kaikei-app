@@ -157,7 +157,7 @@ export default function App() {
   };
 
   return (
-    <div style={appStyle}>
+    <div className="app-shell" style={appStyle}>
       <header style={headerStyle}>
         {isInner ? (
           <button onClick={handleBack} style={backBtnStyle}>←</button>
@@ -336,7 +336,7 @@ const SubTabItem = ({ label, active, onClick }: { label: string; active: boolean
   </button>
 );
 
-const appStyle: React.CSSProperties = { maxWidth: 480, margin: '0 auto', height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--color-background-primary)', position: 'relative' };
+const appStyle: React.CSSProperties = { margin: '0 auto', height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--color-background-primary)', position: 'relative' };
 const headerStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '0.5px solid var(--color-border-tertiary)', background: 'var(--color-background-secondary, #f5f5f5)', minHeight: 48, gap: 8 };
 const headerTitleStyle: React.CSSProperties = { flex: 1, fontSize: 15, fontWeight: 500, color: 'var(--color-text-primary)', textAlign: 'center' };
 const backBtnStyle: React.CSSProperties = { background: 'none', border: 'none', fontSize: 18, color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '0 4px' };
