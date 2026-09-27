@@ -228,8 +228,9 @@ const buildPreviewHtml = (bodyHtml: string, customCss: string) => `<!doctype htm
   h4 { font-size: 1em; }
   p { margin: 0.8em 0; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f0f0f0; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
-  pre { background: #f5f5f5; border: 0.5px solid #d0d0d0; border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
-  pre code { background: none; padding: 0; }
+  /* コードブロックはページ全体の配色に関わらず常に暗背景+白文字にする（読みやすさ優先）。 */
+  pre { background: #1e1e1e; border: 0.5px solid #333; border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #ffffff; }
   blockquote { margin: 0.8em 0; padding: 0.2em 1em; border-left: 4px solid #d0d0d0; color: #555; }
   hr { border: none; border-top: 1px solid #d0d0d0; margin: 2em 0; }
   table { border-collapse: collapse; margin: 1em 0; width: 100%; }
@@ -241,7 +242,6 @@ const buildPreviewHtml = (bodyHtml: string, customCss: string) => `<!doctype htm
   @media (prefers-color-scheme: dark) {
     body { color: #e6e6e6; background: #1a1a1a; }
     code { background: #2a2a2a; }
-    pre { background: #222; border-color: #3a3a3a; }
     th { background: #242424; }
     th, td { border-color: #3a3a3a; }
     h1, h2 { border-color: #333; }
