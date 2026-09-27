@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { marked } from 'marked';
 import { useNotepad } from '../hooks/useNotepad';
 
 // プルダウンから挿入する Markdown 記法の一覧。忘れがちな記法をここに登録しておく。
@@ -29,7 +30,7 @@ const MD_SNIPPETS: MdSnippet[] = [
   },
 ];
 
-export const NotepadPage = ({ isGuest }: { isGuest: boolean }) => {
+export const NotepadPage = ({ isGuest, previewCss }: { isGuest: boolean; previewCss: string }) => {
   const { content, saved, onChange, save } = useNotepad(isGuest);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -77,6 +78,20 @@ export const NotepadPage = ({ isGuest }: { isGuest: boolean }) => {
     URL.revokeObjectURL(a.href);
   };
 
+  const handlePreview = () => {
+    const bodyHtml = marked.parse(content, { async: false }) as string;
+    // 同じウィンドウ名を指定することで、開きっぱなしのプレビュー窓を使い回す。
+    const w = window.open('', 'notepad-preview', 'width=820,height=900');
+    if (!w) {
+      alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+      return;
+    }
+    w.document.open();
+    w.document.write(buildPreviewHtml(bodyHtml, previewCss));
+    w.document.close();
+    w.focus();
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
@@ -90,6 +105,7 @@ export const NotepadPage = ({ isGuest }: { isGuest: boolean }) => {
           </span>
           <button onClick={save} style={saved ? btnStyle : saveBtnUnsavedStyle}>保存</button>
           <button onClick={handleDownload} style={btnStyle}>DL (.txt)</button>
+          <button onClick={handlePreview} style={btnStyle}>プレビュー</button>
         </div>
       </div>
 
@@ -186,3 +202,55 @@ const mdSelectStyle: React.CSSProperties = {
   color: '#1a1a1a',
   fontSize: 13,
 };
+
+// <style> はHTML上の raw text 要素のため、中に "</style" という文字列が現れると
+// そこでタグが終了したとみなされてしまう。ユーザー定義CSSにも起こりうるので分断しておく。
+const escapeStyleContent = (css: string) => css.replace(/<\/style/gi, '<\\/style');
+
+const buildPreviewHtml = (bodyHtml: string, customCss: string) => `<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Markdown Preview</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0; padding: 24px 32px 64px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+    line-height: 1.75; color: #1a1a1a; background: #ffffff;
+    max-width: 760px; margin-left: auto; margin-right: auto;
+  }
+  h1, h2, h3, h4 { line-height: 1.4; margin: 1.4em 0 0.5em; }
+  h1 { font-size: 1.6em; border-bottom: 1px solid #e0e0e0; padding-bottom: 0.3em; }
+  h2 { font-size: 1.35em; border-bottom: 1px solid #e0e0e0; padding-bottom: 0.3em; }
+  h3 { font-size: 1.15em; }
+  h4 { font-size: 1em; }
+  p { margin: 0.8em 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f0f0f0; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #f5f5f5; border: 0.5px solid #d0d0d0; border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
+  pre code { background: none; padding: 0; }
+  blockquote { margin: 0.8em 0; padding: 0.2em 1em; border-left: 4px solid #d0d0d0; color: #555; }
+  hr { border: none; border-top: 1px solid #d0d0d0; margin: 2em 0; }
+  table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+  th, td { border: 1px solid #d0d0d0; padding: 6px 10px; text-align: left; }
+  th { background: #f5f5f5; }
+  ul, ol { padding-left: 1.6em; }
+  li { margin: 0.25em 0; }
+  input[type="checkbox"] { margin-right: 0.4em; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e6e6e6; background: #1a1a1a; }
+    code { background: #2a2a2a; }
+    pre { background: #222; border-color: #3a3a3a; }
+    th { background: #242424; }
+    th, td { border-color: #3a3a3a; }
+    h1, h2 { border-color: #333; }
+    blockquote { color: #aaa; border-color: #444; }
+  }
+</style>
+${customCss.trim() ? `<style id="notepad-custom-css">\n${escapeStyleContent(customCss)}\n</style>` : ''}
+</head>
+<body>
+${bodyHtml}
+</body>
+</html>`;

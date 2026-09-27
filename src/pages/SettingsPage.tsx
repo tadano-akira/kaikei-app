@@ -44,6 +44,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
   const [lifeInsuranceDeduction, setLifeInsuranceDeduction] = useState('');
   const [idecoDeduction, setIdecoDeduction] = useState('');
   const [smallBusinessDeduction, setSmallBusinessDeduction] = useState('');
+  const [previewCustomCss, setPreviewCustomCss] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState(false);
 
@@ -59,6 +60,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
     setLifeInsuranceDeduction(settings.lifeInsuranceDeduction.toString());
     setIdecoDeduction(settings.idecoDeduction.toString());
     setSmallBusinessDeduction(settings.smallBusinessDeduction.toString());
+    setPreviewCustomCss(settings.previewCustomCss ?? '');
   }, [settings]);
 
   const handleSave = async () => {
@@ -75,6 +77,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
       lifeInsuranceDeduction: parseInt(lifeInsuranceDeduction) || 0,
       idecoDeduction: parseInt(idecoDeduction) || 0,
       smallBusinessDeduction: parseInt(smallBusinessDeduction) || 0,
+      previewCustomCss,
     });
     setSaving(false);
     setSavedMsg(true);
@@ -159,6 +162,24 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
             </FieldRow>
           </div>
         ))}
+      </section>
+
+      {/* テキストエディタ */}
+      <section style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>テキストエディタ</h2>
+        <div style={{ padding: '10px 0' }}>
+          <div style={{ fontSize: 13, color: 'var(--color-text-primary)', fontWeight: 500 }}>プレビュー用CSS</div>
+          <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginTop: 2, marginBottom: 8 }}>
+            Markdownプレビュー画面に追加で適用するCSS（任意）
+          </div>
+          <textarea
+            value={previewCustomCss}
+            onChange={e => setPreviewCustomCss(e.target.value)}
+            placeholder={'例:\nbody { font-size: 16px; }\nh1 { color: #2563eb; }'}
+            spellCheck={false}
+            style={cssTextareaStyle}
+          />
+        </div>
       </section>
 
       {/* データエクスポート */}
@@ -291,6 +312,20 @@ const numInputStyle: React.CSSProperties = {
   color: '#1a1a1a',
   fontSize: 14,
   textAlign: 'right',
+};
+const cssTextareaStyle: React.CSSProperties = {
+  width: '100%',
+  minHeight: 120,
+  padding: '8px 10px',
+  borderRadius: 8,
+  border: '0.5px solid #d0d0d0',
+  background: '#f5f5f5',
+  color: '#1a1a1a',
+  fontSize: 12,
+  fontFamily: 'monospace',
+  lineHeight: 1.6,
+  resize: 'vertical',
+  boxSizing: 'border-box',
 };
 const selectStyle: React.CSSProperties = {
   padding: '6px 8px',

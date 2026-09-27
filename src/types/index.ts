@@ -106,6 +106,7 @@ export interface Settings {
   lifeInsuranceDeduction: number;    // 生命保険料控除 (円)
   idecoDeduction: number;            // iDeCo控除 (円)
   smallBusinessDeduction: number;    // 小規模企業共済控除 (円)
+  previewCustomCss: string;          // Markdownプレビュー画面に適用する追加CSS
   updatedAt: string;
 }
 

@@ -275,7 +275,7 @@ export default function App() {
         )}
         {tab === 'todo' && <TodoPage isGuest={isGuest} />}
         {tab === 'memo' && <MemoPage isGuest={isGuest} />}
-        {tab === 'notepad' && <NotepadPage isGuest={isGuest} />}
+        {tab === 'notepad' && <NotepadPage isGuest={isGuest} previewCss={settings.previewCustomCss ?? ''} />}
         {tab === 'daily' && <DailyReportPage isGuest={isGuest} />}
         {tab === 'settings' && (
           <SettingsPage settings={settings} loading={settingsLoading} onSave={saveSettings} expenses={expenses} sales={sales} />

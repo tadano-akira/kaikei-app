@@ -5,6 +5,34 @@ import { localStore, LOCAL_KEYS } from '../lib/localStore';
 import { Settings } from '../types';
 import { runNetworkAction } from '../lib/network';
 
+// Markdownプレビューの初期CSS。ユーザーはここから自由に編集できる。
+export const DEFAULT_PREVIEW_CSS = `/* 背景色 */
+body {
+  background-color: #ffffff;
+}
+
+/* 文字サイズ */
+body {
+  font-size: 15px;
+}
+
+/* 文字色 */
+body {
+  color: #1a1a1a;
+}
+
+/* 表: 罫線1pxとヘッダー行の背景色（薄い灰色） */
+table {
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid #333333;
+}
+thead th {
+  background-color: #eeeeee;
+}
+`;
+
 const DEFAULT: Settings = {
   targetExpenseRate: 30,
   monthlyExpenseBudget: 0,
@@ -17,6 +45,7 @@ const DEFAULT: Settings = {
   lifeInsuranceDeduction: 0,
   idecoDeduction: 0,
   smallBusinessDeduction: 0,
+  previewCustomCss: DEFAULT_PREVIEW_CSS,
   updatedAt: '',
 };
 
