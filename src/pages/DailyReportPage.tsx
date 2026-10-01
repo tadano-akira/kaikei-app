@@ -5,6 +5,13 @@ import { DailyReport } from '../types';
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const formatDate = (s: string) => { const [y, m, d] = s.split('-'); return `${y}年${m}月${d}日`; };
 
+// 15分刻みの時刻選択肢（00:00〜23:45）
+const TIME_OPTIONS: string[] = Array.from({ length: 24 * 4 }, (_, i) => {
+  const h = Math.floor(i / 4);
+  const m = (i % 4) * 15;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+});
+
 export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
   const { reports, save, remove } = useDailyReports(isGuest);
   const [modal, setModal] = useState(false);
@@ -13,13 +20,45 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
   const [done, setDone] = useState('');
   const [plan, setPlan] = useState('');
   const [note, setNote] = useState('');
+  const [workStartTime, setWorkStartTime] = useState('');
+  const [workEndTime, setWorkEndTime] = useState('');
+  const [breakHours, setBreakHours] = useState('');
 
-  const openAdd = () => { setEditTarget(null); setDate(todayStr()); setDone(''); setPlan(''); setNote(''); setModal(true); };
-  const openEdit = (r: DailyReport) => { setEditTarget(r); setDate(r.date); setDone(r.done); setPlan(r.plan); setNote(r.note); setModal(true); };
+  const openAdd = () => {
+    setEditTarget(null);
+    setDate(todayStr());
+    setDone('');
+    setPlan('');
+    setNote('');
+    setWorkStartTime('');
+    setWorkEndTime('');
+    setBreakHours('');
+    setModal(true);
+  };
+  const openEdit = (r: DailyReport) => {
+    setEditTarget(r);
+    setDate(r.date);
+    setDone(r.done);
+    setPlan(r.plan);
+    setNote(r.note);
+    setWorkStartTime(r.workStartTime ?? '');
+    setWorkEndTime(r.workEndTime ?? '');
+    setBreakHours(r.breakHours != null ? String(r.breakHours) : '');
+    setModal(true);
+  };
 
   const handleSave = async () => {
     if (!date) return;
-    await save(date, done, plan, note, editTarget?.id);
+    await save(
+      date,
+      done,
+      plan,
+      note,
+      editTarget?.id,
+      workStartTime || null,
+      workEndTime || null,
+      breakHours !== '' ? Number(breakHours) : null,
+    );
     setModal(false);
   };
 
@@ -45,6 +84,12 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
               <button onClick={() => remove(r.id)} style={{ ...iconBtnStyle, color: 'var(--color-text-danger)' }}>削除</button>
             </div>
           </div>
+          {(r.workStartTime || r.workEndTime || r.breakHours != null) && (
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>
+              🕒 {r.workStartTime ?? '－'}〜{r.workEndTime ?? '－'}
+              {r.breakHours != null && `（休憩 ${r.breakHours}h）`}
+            </div>
+          )}
           {r.done && <Section label="✅ 今日やったこと" body={r.done} />}
           {r.plan && <Section label="📋 明日やること" body={r.plan} />}
           {r.note && <Section label="💬 所感・メモ" body={r.note} />}
@@ -59,6 +104,41 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
             </div>
             <label style={labelStyle}>日付</label>
             <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <label style={labelStyle}>業務開始時間（任意）</label>
+                <select value={workStartTime} onChange={e => setWorkStartTime(e.target.value)} style={inputStyle}>
+                  <option value="">未入力</option>
+                  {TIME_OPTIONS.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={labelStyle}>業務終了時間（任意）</label>
+                <select value={workEndTime} onChange={e => setWorkEndTime(e.target.value)} style={inputStyle}>
+                  <option value="">未入力</option>
+                  {TIME_OPTIONS.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <label style={labelStyle}>休憩時間（任意・単位: h）</label>
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              max={24}
+              step={0.25}
+              value={breakHours}
+              onChange={e => setBreakHours(e.target.value)}
+              placeholder="例: 1"
+              style={inputStyle}
+            />
+
             <label style={labelStyle}>今日やったこと</label>
             <textarea value={done} onChange={e => setDone(e.target.value)} rows={3} placeholder="完了したタスクや作業内容..." style={{ ...inputStyle, resize: 'vertical' }} />
             <label style={labelStyle}>明日やること</label>

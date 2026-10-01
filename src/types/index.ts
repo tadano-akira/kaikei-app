@@ -117,6 +117,10 @@ export interface DailyReport {
   done: string;
   plan: string;
   note: string;
+  // 任意項目。開始・終了は "HH:MM" 形式（15分刻み）、休憩時間は h 単位。
+  workStartTime?: string | null;
+  workEndTime?: string | null;
+  breakHours?: number | null;
   createdAt: string;
   updatedAt: string;
 }

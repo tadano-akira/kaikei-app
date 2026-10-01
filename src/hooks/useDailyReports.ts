@@ -38,14 +38,28 @@ export const useDailyReports = (isGuest: boolean) => {
     localStore.setList(LOCAL_KEYS.dailyReports, sorted);
   };
 
-  const save = async (date: string, done: string, plan: string, note: string, editId?: string) => {
+  const save = async (
+    date: string,
+    done: string,
+    plan: string,
+    note: string,
+    editId?: string,
+    workStartTime?: string | null,
+    workEndTime?: string | null,
+    breakHours?: number | null,
+  ) => {
     const now = new Date().toISOString();
+    const timeFields = {
+      workStartTime: workStartTime || null,
+      workEndTime: workEndTime || null,
+      breakHours: breakHours ?? null,
+    };
 
     if (isGuest) {
       if (editId) {
-        persistLocal(reports.map(r => r.id === editId ? { ...r, date, done, plan, note, updatedAt: now } : r));
+        persistLocal(reports.map(r => r.id === editId ? { ...r, date, done, plan, note, ...timeFields, updatedAt: now } : r));
       } else {
-        const item: DailyReport = { id: crypto.randomUUID(), date, done, plan, note, createdAt: now, updatedAt: now };
+        const item: DailyReport = { id: crypto.randomUUID(), date, done, plan, note, ...timeFields, createdAt: now, updatedAt: now };
         persistLocal([item, ...reports]);
       }
       return;
@@ -54,11 +68,11 @@ export const useDailyReports = (isGuest: boolean) => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
     if (editId) {
-      await runNetworkAction(() => updateDoc(doc(getRef(uid), editId), { date, done, plan, note, updatedAt: now }));
+      await runNetworkAction(() => updateDoc(doc(getRef(uid), editId), { date, done, plan, note, ...timeFields, updatedAt: now }));
     } else {
       const clientId = pendingCreateId.current ?? crypto.randomUUID();
       pendingCreateId.current = clientId;
-      await runNetworkAction(() => setDoc(doc(getRef(uid), clientId), { date, done, plan, note, createdAt: now, updatedAt: now }));
+      await runNetworkAction(() => setDoc(doc(getRef(uid), clientId), { date, done, plan, note, ...timeFields, createdAt: now, updatedAt: now }));
       pendingCreateId.current = null;
     }
   };
