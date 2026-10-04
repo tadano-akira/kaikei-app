@@ -111,16 +111,34 @@ export interface Settings {
 }
 
 // ===== 日報 =====
+// 今日やったことの1項目。稼働時間(hours)は任意。単位は h。
+export interface DailyReportItem {
+  content: string;
+  hours: number | null;
+}
+
 export interface DailyReport {
   id: string;
   date: string; // YYYY-MM-DD
-  done: string;
+  // 今日やったこと（箇条書き）。旧データは done（改行区切りのテキスト）のまま残っている場合がある。
+  items?: DailyReportItem[];
+  done?: string;
   plan: string;
-  note: string;
+  note: string; // 所感・メモ
   // 任意項目。開始・終了は "HH:MM" 形式（15分刻み）、休憩時間は h 単位。
   workStartTime?: string | null;
   workEndTime?: string | null;
   breakHours?: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DailyReportInput {
+  date: string;
+  items: DailyReportItem[];
+  plan: string;
+  note: string;
+  workStartTime: string | null;
+  workEndTime: string | null;
+  breakHours: number | null;
 }
