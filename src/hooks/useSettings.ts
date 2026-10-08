@@ -47,6 +47,7 @@ const DEFAULT: Settings = {
   smallBusinessDeduction: 0,
   previewCustomCss: DEFAULT_PREVIEW_CSS,
   dailyReportDefaultStartTime: null,
+  dailyReportDefaultEndTime: null,
   updatedAt: '',
 };
 

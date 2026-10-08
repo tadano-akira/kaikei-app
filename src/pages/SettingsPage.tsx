@@ -47,6 +47,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
   const [smallBusinessDeduction, setSmallBusinessDeduction] = useState('');
   const [previewCustomCss, setPreviewCustomCss] = useState('');
   const [dailyReportDefaultStartTime, setDailyReportDefaultStartTime] = useState('');
+  const [dailyReportDefaultEndTime, setDailyReportDefaultEndTime] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState(false);
 
@@ -64,6 +65,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
     setSmallBusinessDeduction(settings.smallBusinessDeduction.toString());
     setPreviewCustomCss(settings.previewCustomCss ?? '');
     setDailyReportDefaultStartTime(settings.dailyReportDefaultStartTime ?? '');
+    setDailyReportDefaultEndTime(settings.dailyReportDefaultEndTime ?? '');
   }, [settings]);
 
   const handleSave = async () => {
@@ -82,6 +84,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
       smallBusinessDeduction: parseInt(smallBusinessDeduction) || 0,
       previewCustomCss,
       dailyReportDefaultStartTime: dailyReportDefaultStartTime || null,
+      dailyReportDefaultEndTime: dailyReportDefaultEndTime || null,
     });
     setSaving(false);
     setSavedMsg(true);
@@ -193,6 +196,19 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
           <select
             value={dailyReportDefaultStartTime}
             onChange={e => setDailyReportDefaultStartTime(e.target.value)}
+            style={selectStyle}
+          >
+            <option value="">未設定</option>
+            {TIME_OPTIONS.map(t => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </FieldRow>
+        <div style={dividerStyle} />
+        <FieldRow label="業務終了時間の初期値" hint="日報を新規作成するときの初期選択値（任意）">
+          <select
+            value={dailyReportDefaultEndTime}
+            onChange={e => setDailyReportDefaultEndTime(e.target.value)}
             style={selectStyle}
           >
             <option value="">未設定</option>

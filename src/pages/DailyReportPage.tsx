@@ -60,7 +60,7 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
     setPlan('');
     setNote('');
     setWorkStartTime(settings.dailyReportDefaultStartTime ?? '');
-    setWorkEndTime('');
+    setWorkEndTime(settings.dailyReportDefaultEndTime ?? '');
     setBreakHours('');
     setModal(true);
   };
