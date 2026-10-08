@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Settings, ConsumptionTaxCategory, Expense, Sales } from '../types';
+import { TIME_OPTIONS } from '../lib/timeOptions';
 
 interface Props {
   settings: Settings;
@@ -45,6 +46,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
   const [idecoDeduction, setIdecoDeduction] = useState('');
   const [smallBusinessDeduction, setSmallBusinessDeduction] = useState('');
   const [previewCustomCss, setPreviewCustomCss] = useState('');
+  const [dailyReportDefaultStartTime, setDailyReportDefaultStartTime] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState(false);
 
@@ -61,6 +63,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
     setIdecoDeduction(settings.idecoDeduction.toString());
     setSmallBusinessDeduction(settings.smallBusinessDeduction.toString());
     setPreviewCustomCss(settings.previewCustomCss ?? '');
+    setDailyReportDefaultStartTime(settings.dailyReportDefaultStartTime ?? '');
   }, [settings]);
 
   const handleSave = async () => {
@@ -78,6 +81,7 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
       idecoDeduction: parseInt(idecoDeduction) || 0,
       smallBusinessDeduction: parseInt(smallBusinessDeduction) || 0,
       previewCustomCss,
+      dailyReportDefaultStartTime: dailyReportDefaultStartTime || null,
     });
     setSaving(false);
     setSavedMsg(true);
@@ -180,6 +184,23 @@ export const SettingsPage = ({ settings, loading, onSave, expenses, sales }: Pro
             style={cssTextareaStyle}
           />
         </div>
+      </section>
+
+      {/* 日報 */}
+      <section style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>日報</h2>
+        <FieldRow label="業務開始時間の初期値" hint="日報を新規作成するときの初期選択値（任意）">
+          <select
+            value={dailyReportDefaultStartTime}
+            onChange={e => setDailyReportDefaultStartTime(e.target.value)}
+            style={selectStyle}
+          >
+            <option value="">未設定</option>
+            {TIME_OPTIONS.map(t => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </FieldRow>
       </section>
 
       {/* データエクスポート */}

@@ -107,6 +107,7 @@ export interface Settings {
   idecoDeduction: number;            // iDeCo控除 (円)
   smallBusinessDeduction: number;    // 小規模企業共済控除 (円)
   previewCustomCss: string;          // Markdownプレビュー画面に適用する追加CSS
+  dailyReportDefaultStartTime: string | null; // 日報の業務開始時間の初期値("HH:MM"、任意)
   updatedAt: string;
 }
 

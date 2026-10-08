@@ -1,20 +1,18 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDailyReports } from '../hooks/useDailyReports';
+import { useSettings } from '../hooks/useSettings';
 import { DailyReport, DailyReportItem } from '../types';
 import { reportItems, reportTotalHours } from '../lib/dailyReport';
 import { downloadDailyReportCsv } from '../lib/dailyReportCsv';
+import { TIME_OPTIONS } from '../lib/timeOptions';
+
+const ITEM_SUGGESTIONS_ID = 'daily-report-item-suggestions';
+const MAX_ITEM_SUGGESTIONS = 50;
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const thisMonthStr = () => todayStr().slice(0, 7);
 const formatDate = (s: string) => { const [y, m, d] = s.split('-'); return `${y}年${m}月${d}日`; };
 const formatHours = (h: number) => `${Number.isInteger(h) ? h : h.toFixed(2).replace(/0$/, '')}h`;
-
-// 15分刻みの時刻選択肢（00:00〜23:45）
-const TIME_OPTIONS: string[] = Array.from({ length: 24 * 4 }, (_, i) => {
-  const h = Math.floor(i / 4);
-  const m = (i % 4) * 15;
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-});
 
 // 入力中の箇条書き1行。hours は入力欄の文字列のまま保持する。
 interface ItemDraft {
@@ -28,6 +26,7 @@ const emptyItem = (): ItemDraft => ({ key: newKey(), content: '', hours: '' });
 
 export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
   const { reports, save, remove } = useDailyReports(isGuest);
+  const { settings } = useSettings(isGuest);
   const [modal, setModal] = useState(false);
   const [editTarget, setEditTarget] = useState<DailyReport | null>(null);
   const [date, setDate] = useState(todayStr());
@@ -39,13 +38,28 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
   const [breakHours, setBreakHours] = useState('');
   const [csvMonth, setCsvMonth] = useState(thisMonthStr());
 
+  // 過去の作業内容を新しい順に重複なく並べたサジェスト候補。
+  const contentSuggestions = useMemo(() => {
+    const seen = new Set<string>();
+    const list: string[] = [];
+    for (const r of reports) {
+      for (const i of reportItems(r)) {
+        if (!seen.has(i.content)) {
+          seen.add(i.content);
+          list.push(i.content);
+        }
+      }
+    }
+    return list.slice(0, MAX_ITEM_SUGGESTIONS);
+  }, [reports]);
+
   const openAdd = () => {
     setEditTarget(null);
     setDate(todayStr());
     setItems([emptyItem()]);
     setPlan('');
     setNote('');
-    setWorkStartTime('');
+    setWorkStartTime(settings.dailyReportDefaultStartTime ?? '');
     setWorkEndTime('');
     setBreakHours('');
     setModal(true);
@@ -205,6 +219,11 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
             />
 
             <label style={labelStyle}>今日やったこと（箇条書き・稼働時間）</label>
+            <datalist id={ITEM_SUGGESTIONS_ID}>
+              {contentSuggestions.map(c => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
             {items.map(item => (
               <div key={item.key} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
                 <span style={{ color: 'var(--color-text-secondary)' }}>・</span>
@@ -214,6 +233,7 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
                   onChange={e => updateItem(item.key, { content: e.target.value })}
                   placeholder="作業内容"
                   maxLength={500}
+                  list={ITEM_SUGGESTIONS_ID}
                   style={{ ...inputStyle, flex: 1, width: 'auto' }}
                 />
                 <input

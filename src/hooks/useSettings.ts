@@ -46,6 +46,7 @@ const DEFAULT: Settings = {
   idecoDeduction: 0,
   smallBusinessDeduction: 0,
   previewCustomCss: DEFAULT_PREVIEW_CSS,
+  dailyReportDefaultStartTime: null,
   updatedAt: '',
 };
 
