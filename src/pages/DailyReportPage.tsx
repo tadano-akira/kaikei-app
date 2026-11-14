@@ -13,6 +13,18 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const thisMonthStr = () => todayStr().slice(0, 7);
 const formatDate = (s: string) => { const [y, m, d] = s.split('-'); return `${y}年${m}月${d}日`; };
 const formatHours = (h: number) => `${Number.isInteger(h) ? h : h.toFixed(2).replace(/0$/, '')}h`;
+const toMinutes = (t: string) => {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+};
+// 開始〜終了から休憩を引いた稼働時間（h）。開始・終了のどちらかが未入力なら null。
+// 終了が開始以前なら日跨ぎとみなす。
+const calcWorkingHours = (start?: string | null, end?: string | null, breakHours?: number | null) => {
+  if (!start || !end) return null;
+  let minutes = toMinutes(end) - toMinutes(start);
+  if (minutes <= 0) minutes += 24 * 60;
+  return Math.max(0, minutes / 60 - (breakHours ?? 0));
+};
 
 // 入力中の箇条書き1行。hours は入力欄の文字列のまま保持する。
 interface ItemDraft {
@@ -137,6 +149,11 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
       {reports.map(r => {
         const rItems = reportItems(r);
         const totalHours = reportTotalHours(r);
+        const workingHours = calcWorkingHours(r.workStartTime, r.workEndTime, r.breakHours);
+        const timeNotes = [
+          r.breakHours != null ? `休憩 ${formatHours(r.breakHours)}` : null,
+          workingHours != null ? `稼働 ${formatHours(workingHours)}` : null,
+        ].filter(Boolean);
         return (
           <div key={r.id} style={cardStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
@@ -149,7 +166,7 @@ export const DailyReportPage = ({ isGuest }: { isGuest: boolean }) => {
             {(r.workStartTime || r.workEndTime || r.breakHours != null) && (
               <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>
                 🕒 {r.workStartTime ?? '－'}〜{r.workEndTime ?? '－'}
-                {r.breakHours != null && `（休憩 ${r.breakHours}h）`}
+                {timeNotes.length > 0 && `（${timeNotes.join(' / ')}）`}
               </div>
             )}
             {rItems.length > 0 && (
